@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Matemáticas para la madera</title>
+<style>
+:root {
+  --azul: #005A9C; --naranja: #C4580C; --nar2: #d35400; --verde: #1e8449; --rojo: #c0392b;
+  --tinta: #1c2733; --sub: #5d6d7e; --borde: #d5dde5; --fondo: #e9edf2; --panel: #ffffff; --suave: #f4f6f8;
+  --ok-bg: #edf7f0; --ko-bg: #fdecea; --pista-bg: #eef4fa; --cuenta-bg: #fdf3ec; --cuenta-borde: #f3d6c2;
+}
+:root[data-theme="dark"] {
+  --azul: #5aa7e0; --naranja: #f0883e; --nar2: #f0883e; --verde: #4cc77f; --rojo: #f07167;
+  --tinta: #e3e9ef; --sub: #9fb0c0; --borde: #33414f; --fondo: #141b22; --panel: #1d262f; --suave: #25303b;
+  --ok-bg: #173325; --ko-bg: #3a1f1f; --pista-bg: #1c2d3e; --cuenta-bg: #2c241d; --cuenta-borde: #4d3a2a;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --azul: #5aa7e0; --naranja: #f0883e; --nar2: #f0883e; --verde: #4cc77f; --rojo: #f07167;
+    --tinta: #e3e9ef; --sub: #9fb0c0; --borde: #33414f; --fondo: #141b22; --panel: #1d262f; --suave: #25303b;
+    --ok-bg: #173325; --ko-bg: #3a1f1f; --pista-bg: #1c2d3e; --cuenta-bg: #2c241d; --cuenta-borde: #4d3a2a;
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font-family: 'Segoe UI', 'DejaVu Sans', Arial, sans-serif; background: var(--fondo); color: var(--tinta); font-size: 15px; line-height: 1.5; }
+header { background: #005A9C; color: #fff; padding: 10px 18px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+header h1 { font-size: 19px; margin: 0; font-weight: 700; }
+header .por { font-size: 12px; opacity: .85; }
+header nav { margin-left: auto; display: flex; gap: 4px; flex-wrap: wrap; }
+header nav button, #tema-btn { background: rgba(255,255,255,.12); color: #fff; border: 1px solid rgba(255,255,255,.3); border-radius: 5px; padding: 6px 12px; font: inherit; font-size: 14px; cursor: pointer; }
+header nav button.on { background: #fff; color: #005A9C; font-weight: 700; }
+#tema-btn { padding: 6px 10px; }
+main { max-width: 1180px; margin: 0 auto; padding: 16px; }
+.vista { display: none; } .vista.on { display: block; }
+.practica { display: grid; grid-template-columns: 250px 1fr; gap: 16px; align-items: start; }
+@media (max-width: 820px) { .practica { grid-template-columns: 1fr; } .temas { display: grid; grid-template-columns: 1fr 1fr; } }
+.panel { background: var(--panel); border: 1px solid var(--borde); border-radius: 8px; padding: 14px 16px; }
+.panel h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--naranja); margin: 0 0 8px; }
+.temas { display: flex; flex-direction: column; gap: 4px; margin-bottom: 14px; }
+.temas button { text-align: left; background: var(--suave); color: var(--tinta); border: 1px solid var(--borde); border-radius: 5px; padding: 7px 10px; font: inherit; font-size: 14px; cursor: pointer; }
+.temas button.on { background: #005A9C; color: #fff; border-color: #005A9C; font-weight: 600; }
+.niveles { display: flex; gap: 4px; margin-bottom: 14px; }
+.niveles button { flex: 1; background: var(--suave); color: var(--tinta); border: 1px solid var(--borde); border-radius: 5px; padding: 6px 4px; font: inherit; font-size: 13px; cursor: pointer; }
+.niveles button span { display: block; }
+.niveles button.on { border-color: var(--naranja); box-shadow: inset 0 0 0 1px var(--naranja); font-weight: 700; }
+.n1 { color: var(--verde); } .n2 { color: var(--nar2); } .n3 { color: var(--rojo); }
+.btn { background: #C4580C; color: #fff; border: 0; border-radius: 6px; padding: 9px 16px; font: inherit; font-weight: 700; cursor: pointer; }
+.btn.sec { background: var(--suave); color: var(--tinta); border: 1px solid var(--borde); font-weight: 600; }
+.btn.azul { background: #005A9C; }
+.btn:disabled { opacity: .5; cursor: default; }
+.ancho { width: 100%; }
+.marcador { margin-top: 14px; font-size: 14px; color: var(--sub); border-top: 1px solid var(--borde); padding-top: 10px; }
+.marcador b { color: var(--tinta); font-size: 18px; }
+.ej-cab { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+.ej-cab h3 { margin: 0; font-size: 18px; color: var(--azul); }
+.ej-cab .niv { font-size: 12px; letter-spacing: 1px; }
+.enun { font-size: 15.5px; margin: 6px 0 10px; }
+.fig { background: #fff; border: 1px solid var(--borde); border-radius: 8px; padding: 6px; margin: 10px 0; text-align: center; }
+.fig svg { width: 100%; max-width: 640px; height: auto; display: block; margin: 0 auto; }
+.fig .esc { font-size: 11px; color: #6b7b8c; font-style: italic; }
+.resp { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; margin: 12px 0; }
+.campo label { display: block; font-size: 13px; color: var(--sub); font-weight: 600; margin-bottom: 3px; }
+.campo .fila { display: flex; align-items: center; gap: 6px; }
+.campo input { width: 100%; font: inherit; font-size: 17px; font-family: Consolas, 'DejaVu Sans Mono', monospace; padding: 7px 9px; border: 1.5px solid var(--borde); border-radius: 6px; background: var(--panel); color: var(--tinta); }
+.campo input:focus { outline: none; border-color: var(--azul); }
+.campo .ud { color: var(--sub); font-size: 14px; min-width: 24px; }
+.campo.ok input { border-color: var(--verde); background: var(--ok-bg); }
+.campo.ko input { border-color: var(--rojo); background: var(--ko-bg); }
+.campo .msg { font-size: 12.5px; min-height: 18px; margin-top: 2px; }
+.campo.ok .msg { color: var(--verde); } .campo.ko .msg { color: var(--rojo); }
+.acciones { display: flex; gap: 8px; flex-wrap: wrap; }
+.caja { border-left: 4px solid var(--azul); background: var(--pista-bg); padding: 10px 14px; margin: 12px 0; border-radius: 0 6px 6px 0; }
+.caja.sol { border-color: var(--naranja); background: var(--panel); border: 1px solid var(--borde); border-left: 4px solid var(--naranja); }
+.caja h4 { margin: 0 0 6px; font-size: 14px; color: var(--azul); }
+.caja.sol h4 { color: var(--naranja); }
+.cuenta { font-family: Consolas, 'DejaVu Sans Mono', monospace; background: var(--cuenta-bg); border: 1px solid var(--cuenta-borde); border-radius: 5px; padding: 5px 9px; margin: 4px 0; display: block; font-size: 14px; white-space: pre-wrap; }
+.pasos { margin: 0; padding-left: 20px; } .pasos li { margin: 6px 0; }
+.aviso { font-size: 13px; color: var(--sub); }
+/* explorar */
+.ex-cab { display: flex; justify-content: space-between; align-items: center; }
+.ex-cab h3 { margin: 0; color: var(--azul); font-size: 18px; }
+.ex-ctrl { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px 18px; margin: 12px 0; }
+.ex-ctrl label { display: block; font-size: 13px; color: var(--sub); font-weight: 600; }
+.ex-ctrl .fila { display: flex; gap: 8px; align-items: center; }
+.ex-ctrl input[type=range] { flex: 1; accent-color: #C4580C; }
+.ex-ctrl input[type=number] { width: 86px; font: inherit; font-family: Consolas, 'DejaVu Sans Mono', monospace; padding: 4px 6px; border: 1px solid var(--borde); border-radius: 5px; background: var(--panel); color: var(--tinta); }
+.ex-res { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; }
+.ex-res div { background: var(--cuenta-bg); border: 1px solid var(--cuenta-borde); border-radius: 6px; padding: 6px 10px; }
+.ex-res span { display: block; font-size: 12.5px; color: var(--sub); }
+.ex-res b { font-family: Consolas, 'DejaVu Sans Mono', monospace; font-size: 20px; }
+#v-explorar.grande .ex-res b { font-size: 30px; } #v-explorar.grande .ex-res span, #v-explorar.grande .ex-ctrl label { font-size: 17px; }
+#v-explorar.grande .fig svg { max-width: 900px; }
+/* ficha */
+.ficha-ctrl { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.ficha-ctrl label.chk { display: flex; align-items: center; gap: 6px; font-size: 14px; margin: 3px 0; cursor: pointer; }
+.ficha-ctrl .num input, .ficha-ctrl input[type=text] { font: inherit; padding: 6px 8px; border: 1px solid var(--borde); border-radius: 5px; background: var(--panel); color: var(--tinta); width: 100%; }
+.ficha-ctrl .num { display: grid; grid-template-columns: 1fr 90px; gap: 6px; align-items: center; font-size: 14px; margin: 5px 0; }
+#ficha-salida { margin-top: 16px; }
+.hoja { background: #fff; color: #1c2733; max-width: 210mm; margin: 0 auto 16px; padding: 14mm 15mm; box-shadow: 0 2px 12px rgba(0,0,0,.15); font-size: 10.5pt; }
+.hoja .cab { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 3px solid #C4580C; padding-bottom: 2mm; margin-bottom: 4mm; }
+.hoja .cab h2 { margin: 0; color: #005A9C; font-size: 16pt; }
+.hoja .cab .dat { font-size: 9.5pt; color: #3d4b59; text-align: right; }
+.hoja .alumno { font-size: 10pt; margin-bottom: 4mm; color: #3d4b59; }
+.hoja .item { display: grid; grid-template-columns: 1fr 96mm; gap: 4mm; padding: 3mm 0; border-bottom: 1px solid #e3e8ee; break-inside: avoid; page-break-inside: avoid; }
+.hoja .item .n { font-weight: 700; color: #005A9C; }
+.hoja .item .niv { font-size: 8pt; letter-spacing: 1px; }
+.hoja .item svg { width: 100%; height: auto; border: 1px solid #e3e8ee; border-radius: 4px; }
+.hoja .item svg text { font-size: 19px !important; }
+.hoja .esc { font-size: 8pt; color: #6b7b8c; font-style: italic; }
+.hoja .hueco { margin-top: 2mm; font-size: 9.5pt; color: #3d4b59; line-height: 2.1; }
+.hoja .hueco span { display: inline-block; min-width: 30mm; border-bottom: 1px solid #8a97a5; margin: 0 1mm; }
+.hoja.solu h3 { color: #005A9C; font-size: 12pt; margin: 4mm 0 1mm; border-bottom: 1px solid #d5dde5; }
+.hoja.solu .s { font-size: 9.5pt; margin: 1mm 0; break-inside: avoid; }
+.hoja.solu .s b { color: #C4580C; }
+.hoja .pie { font-size: 8pt; color: #8a97a5; margin-top: 4mm; }
+/* formulario */
+.tabla { border-collapse: collapse; width: 100%; }
+.tabla th { background: #005A9C; color: #fff; text-align: left; padding: 7px 10px; font-size: 14px; }
+.tabla td { border-bottom: 1px solid var(--borde); padding: 7px 10px; vertical-align: top; font-size: 14px; }
+.tabla td:first-child { font-weight: 700; color: var(--azul); white-space: nowrap; }
+code { font-family: Consolas, 'DejaVu Sans Mono', monospace; background: var(--suave); border: 1px solid var(--borde); border-radius: 3px; padding: 0 4px; font-size: 13.5px; white-space: nowrap; display: inline-block; margin: 2px 4px 2px 0; }
+footer { text-align: center; font-size: 12px; color: var(--sub); padding: 18px; }
+@media print {
+  @page { size: A4; margin: 12mm 13mm; }
+  body { background: #fff; }
+  header, footer, #v-practica, #v-formulario, #v-explorar, .ficha-ctrl, .panel.ctl, #v-ficha > .panel { display: none !important; }
+  main { padding: 0; max-width: none; }
+  #v-ficha { display: block !important; }
+  #ficha-salida { margin: 0; }
+  .hoja { box-shadow: none; margin: 0; max-width: none; padding: 0; page-break-after: always; break-after: page; }
+  .hoja:last-child { page-break-after: auto; break-after: auto; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>📐 Matemáticas para la madera</h1><div class="por">Por Eloi A.A. · v1.1 · 2026.11</div></div>
+  <nav>
+    <a href="../" style="color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,.3);border-radius:5px;padding:6px 12px;font-size:14px">← Inicio</a>
+    <button data-v="practica" class="on">Practicar</button>
+    <button data-v="ficha">Ficha imprimible</button>
+    <button data-v="explorar">Explorar</button>
+    <button data-v="formulario">Formulario</button>
+  </nav>
+  <button id="tema-btn" title="Modo claro / oscuro">🌓</button>
+</header>
+<main>
+<!-- PRACTICAR -->
+<section class="vista on" id="v-practica">
+  <div class="practica">
+    <div class="panel">
+      <h2>Tema</h2>
+      <div class="temas" id="temas"></div>
+      <h2>Nivel</h2>
+      <div class="niveles" id="niveles">
+        <button data-n="1" class="on"><span class="n1">●</span> Básico</button>
+        <button data-n="2"><span class="n2">●●</span> Medio</button>
+        <button data-n="3"><span class="n3">●●●</span> Avanzado</button>
+      </div>
+      <button class="btn ancho" id="nuevo">Nuevo ejercicio</button>
+      <div class="marcador">Aciertos: <b id="m-ok">0</b> de <b id="m-tot">0</b> &nbsp;·&nbsp; Racha: <b id="m-racha">0</b>
+        <div class="aviso" style="margin-top:6px">Un ejercicio cuenta como acierto si todos los resultados están bien en el primer intento.</div>
+      </div>
+    </div>
+    <div class="panel" id="ejercicio"></div>
+  </div>
+</section>
+
+<!-- FICHA -->
+<section class="vista" id="v-ficha">
+  <div class="panel">
+    <div class="ficha-ctrl">
+      <div>
+        <h2>Temas</h2>
+        <div id="f-temas"></div>
+      </div>
+      <div>
+        <h2>Niveles</h2>
+        <label class="chk"><input type="checkbox" class="f-niv" value="1" checked> <span class="n1">●</span> Básico</label>
+        <label class="chk"><input type="checkbox" class="f-niv" value="2" checked> <span class="n2">●●</span> Medio</label>
+        <label class="chk"><input type="checkbox" class="f-niv" value="3"> <span class="n3">●●●</span> Avanzado</label>
+        <h2 style="margin-top:14px">Hoja</h2>
+        <input type="text" id="f-titulo" value="Matemáticas para la madera · Ejercicios">
+      </div>
+      <div>
+        <h2>Cantidad</h2>
+        <div class="num"><span>Ejercicios por hoja</span><input type="number" id="f-n" value="6" min="1" max="20"></div>
+        <div class="num"><span>Versiones distintas</span><input type="number" id="f-ver" value="1" min="1" max="40"></div>
+        <div class="num"><span>Número de serie</span><input type="number" id="f-semilla" value="1" min="1" max="99999"></div>
+        <label class="chk"><input type="checkbox" id="f-sol" checked> Añadir las soluciones al final</label>
+        <div class="aviso">Con el mismo número de serie salen siempre las mismas hojas. Con varias versiones, cada alumno tiene ejercicios distintos del mismo tipo.</div>
+      </div>
+    </div>
+    <div class="acciones" style="margin-top:12px">
+      <button class="btn azul" id="f-gen">Generar</button>
+      <button class="btn" id="f-imp" disabled>Imprimir o guardar en PDF</button>
+    </div>
+  </div>
+  <div id="ficha-salida"></div>
+</section>
+
+<!-- EXPLORAR -->
+<section class="vista" id="v-explorar">
+  <div class="practica">
+    <div class="panel">
+      <h2>Figura</h2>
+      <div class="temas" id="ex-lista"></div>
+      <div class="aviso">Mueve los deslizadores o escribe el valor: la figura y los resultados cambian al momento. Pensado para explicar en la pizarra digital.</div>
+    </div>
+    <div class="panel">
+      <div class="ex-cab"><h3 id="ex-tit"></h3><button class="btn sec" id="ex-grande" title="Letra grande para la pizarra">A+</button></div>
+      <div class="fig" id="ex-fig"></div>
+      <div class="ex-ctrl" id="ex-ctrl"></div>
+      <div class="ex-res" id="ex-res"></div>
+    </div>
+  </div>
+</section>
+
+<!-- FORMULARIO -->
+<section class="vista" id="v-formulario">
+  <div class="panel">
+    <table class="tabla">
+      <tr><th>Para</th><th>Fórmula</th></tr>
+      <tr><td>Pitágoras</td><td><code>c = √(a² + b²)</code><code>a = √(c² − b²)</code></td></tr>
+      <tr><td>Trigonometría</td><td><code>sen α = op / hip</code><code>cos α = cont / hip</code><code>tan α = op / cont</code></td></tr>
+      <tr><td>Ángulo</td><td><code>α = tan⁻¹(op / cont)</code><code>α = sen⁻¹(op / hip)</code><code>α = cos⁻¹(cont / hip)</code></td></tr>
+      <tr><td>Pendiente</td><td><code>% = 100 · tan α</code><code>1:n → α = tan⁻¹(1 / n)</code></td></tr>
+      <tr><td>Escalera</td><td><code>2c + h ≈ 630</code><code>c = H / n</code><code>recorrido = (n − 1) · h</code><code>α = tan⁻¹(c / h)</code></td></tr>
+      <tr><td>Marco de n lados</td><td><code>corte = 180° / n</code><code>L ext = L int + 2 · w · tan(corte)</code></td></tr>
+      <tr><td>Esquina de β grados</td><td><code>corte = (180° − β) / 2</code></td></tr>
+      <tr><td>Polígono (W entre caras)</td><td><code>lado = W · tan(180° / n)</code><code>D = W / cos(180° / n)</code></td></tr>
+      <tr><td>Arco</td><td><code>R = c² / (8f) + f / 2</code><code>f = R − √(R² − (c/2)²)</code></td></tr>
+      <tr><td>Largo de arco</td><td><code>θ = 2 · sen⁻¹(c / 2R)</code><code>arco = π · R · θ / 180</code></td></tr>
+      <tr><td>Radio de esquina</td><td><code>90°: r = d · (√2 + 1)</code><code>θ: r = d · sen(θ/2) / (1 − sen(θ/2))</code></td></tr>
+      <tr><td>Reparto</td><td><code>s = (H − n · e) / (n + 1)</code></td></tr>
+      <tr><td>Recta en la CNC</td><td><code>ΔX = L · cos α</code><code>ΔY = L · sen α</code><code>L = √(ΔX² + ΔY²)</code></td></tr>
+      <tr><td>Cubierta</td><td><code>h = a · tan θ</code><code>par = (a + v) / cos θ</code><code>cerchas = L / s + 1</code><code>nudillo = 2a · (h − y) / h</code></td></tr>
+      <tr><td>Limatesa</td><td><code>lima = √(2a² + h²)</code><code>φ = tan⁻¹(h / (a√2))</code><code>tan b = sen φ</code><code>patillas: s / cos θ</code></td></tr>
+      <tr><td>Inglete compuesto</td><td><code>X = tan⁻¹(sen t · tan(180°/n))</code><code>Y = sen⁻¹(cos t · sen(180°/n))</code><code>tabla = H / cos t</code></td></tr>
+      <tr><td>Escarzano · ojival</td><td><code>escarzano: R = L, f = 0.134 · L</code><code>ojival: R = (h² + L²/4) / L</code><code>equilátero: h = 0.866 · L</code></td></tr>
+      <tr><td>Carpanel</td><td><code>k = √(a² + f²)</code><code>d = a − f</code><code>r₁ = k(k − d) / 2a</code><code>y = ((a − r₁)² − (f − r₁)²) / 2(f − r₁)</code><code>r₂ = f + y</code></td></tr>
+      <tr><td>Elipse · cimbra</td><td><code>c = √(a² − b²)</code><code>cuerda = 2a</code><code>segmento: 2R · sen(θ/2n)</code><code>s = R(1 − cos(θ/2n))</code></td></tr>
+    </table>
+    <p class="aviso" style="margin-top:12px">⚠️ Calculadora en modo <b>DEG</b> (prueba: tan 45 = 1). Usa todos los decimales y redondea al final. Puedes escribir los decimales con punto o con coma.</p>
+  </div>
+</section>
+</main>
+<footer>Matemáticas para la madera · © 2026 Eloi A.A. · EUPL-1.2 · Funciona sin conexión</footer>
+
+<script src="assets/three.min.js"></script>
+<script>
+'use strict';
+/* ================================================================ utilidades */
+const C = { azul: '#005A9C', nar: '#d35400', nar2: '#C4580C', verde: '#1e8449', rojo: '#c0392b', gris: '#8a97a5', tinta: '#1c2733', sub: '#3d4b59', mad: '#ead7b8', madL: '#a9825a', madD: '#c9a27a' };
+const FONT = "'Segoe UI','DejaVu Sans',Arial,sans-serif", MONO = "Consolas,'DejaVu Sans Mono',monospace";
+const D2R = Math.PI / 180;
+const sin = a => Math.sin(a * D2R), cos = a => Math.cos(a * D2R), tan = a => Math.tan(a * D2R);
+const asin = x => Math.asin(x) / D2R, acos = x => Math.acos(x) / D2R, atan = x => Math.atan(x) / D2R;
+const sq = Math.sqrt;
+function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+let RND = Math.random;
+const ri = (a, b) => a + Math.floor(RND() * (b - a + 1));
+const rs = (a, b, s) => a + s * Math.floor(RND() * (Math.floor((b - a) / s) + 1));
+const pick = arr => arr[Math.floor(RND() * arr.length)];
+function F(x, d = 1) { let s = (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d); if (s.includes('.')) s = s.replace(/0+$/, '').replace(/\.$/, ''); if (s === '-0') s = '0'; return s.replace('-', '−'); }
+function N(x) { return x.toLocaleString('es-ES').replace(/\./g, ' '); } // miles con espacio
+const r3 = x => Math.round(x * 1000) / 1000;
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+const cu = (...l) => '<span class="cuenta">' + l.join('<br>') + '</span>';
+function P(cx, cy, r, a) { return [cx + r * cos(a), cy - r * sin(a)]; }
+const f2 = v => v.toFixed(2);
+
+/* ================================================================ dibujo SVG */
+class G {
+  constructor(w = 600, h = 330) { this.w = w; this.h = h; this.el = []; this.cols = new Set(); this.id = 'g' + (++G.n) + '_'; this.note = ''; }
+  mk(c) { this.cols.add(c); return `url(#${this.id}${c.slice(1)})`; }
+  line(x1, y1, x2, y2, c = C.tinta, w = 1.6, o = {}) {
+    let a = `<line x1="${f2(x1)}" y1="${f2(y1)}" x2="${f2(x2)}" y2="${f2(y2)}" stroke="${c}" stroke-width="${w}"`;
+    if (o.dash) a += ` stroke-dasharray="${o.dash}"`; if (o.cap) a += ` stroke-linecap="${o.cap}"`;
+    if (o.a1) a += ` marker-start="${this.mk(c)}"`; if (o.a2) a += ` marker-end="${this.mk(c)}"`;
+    this.el.push(a + '/>');
+  }
+  text(x, y, t, c = C.tinta, size = 14, anchor = 'middle', weight = 700, mono = false) {
+    this.el.push(`<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" fill="${c}" font-size="${size}" font-family="${mono ? MONO : FONT}" text-anchor="${anchor}" font-weight="${weight}">${t}</text>`);
+  }
+  poly(pts, fill = 'none', stroke = null, w = 1.4, dash = null, close = true) {
+    const p = pts.map(q => f2(q[0]) + ',' + f2(q[1])).join(' ');
+    let a = `<${close ? 'polygon' : 'polyline'} points="${p}" fill="${fill}"`;
+    if (stroke) a += ` stroke="${stroke}" stroke-width="${w}" stroke-linejoin="round"`; if (dash) a += ` stroke-dasharray="${dash}"`;
+    this.el.push(a + '/>');
+  }
+  rect(x, y, w, h, fill = 'none', stroke = null, sw = 1.2) { let a = `<rect x="${f2(x)}" y="${f2(y)}" width="${f2(w)}" height="${f2(h)}" fill="${fill}"`; if (stroke) a += ` stroke="${stroke}" stroke-width="${sw}"`; this.el.push(a + '/>'); }
+  path(d, fill = 'none', stroke = C.tinta, w = 1.6, dash = null) { let a = `<path d="${d}" fill="${fill}" stroke="${stroke}" stroke-width="${w}" stroke-linejoin="round"`; if (dash) a += ` stroke-dasharray="${dash}"`; this.el.push(a + '/>'); }
+  dot(x, y, c = C.tinta, r = 4) { this.el.push(`<circle cx="${f2(x)}" cy="${f2(y)}" r="${r}" fill="${c}"/>`); }
+  cross(x, y, c = C.azul, k = 8) { this.line(x - k, y, x + k, y, c, 2); this.line(x, y - k, x, y + k, c, 2); }
+  dim(x1, y1, x2, y2, off, label, c = C.azul, size = 13, lab = 12) {
+    const dx = x2 - x1, dy = y2 - y1, L = Math.hypot(dx, dy); if (L < 1) return;
+    const ux = dx / L, uy = dy / L, nx = uy, ny = -ux, sg = off >= 0 ? 1 : -1;
+    const ax = x1 + nx * off, ay = y1 + ny * off, bx = x2 + nx * off, by = y2 + ny * off;
+    if (Math.abs(off) > 6) { this.line(x1 + nx * sg * 4, y1 + ny * sg * 4, ax + nx * sg * 5, ay + ny * sg * 5, c, 0.9); this.line(x2 + nx * sg * 4, y2 + ny * sg * 4, bx + nx * sg * 5, by + ny * sg * 5, c, 0.9); }
+    this.line(ax + ux, ay + uy, bx - ux, by - uy, c, 1.2, { a1: L > 22, a2: L > 22 });
+    if (label !== null && label !== undefined && label !== '') {
+      let mx = (ax + bx) / 2 + nx * sg * lab, my = (ay + by) / 2 + ny * sg * lab; const ddx = nx * sg, ddy = ny * sg;
+      const an = ddx > 0.5 ? 'start' : (ddx < -0.5 ? 'end' : 'middle');
+      if (Math.abs(ddy) < 0.5) my += size * 0.35; else if (ddy > 0) my += size * 0.75; else my -= 1;
+      this.text(mx, my, label, c, size, an, 700);
+    }
+  }
+  ang(cx, cy, r, a1, a2, label = null, c = C.tinta, lr = null, size = 13) {
+    const [x1, y1] = P(cx, cy, r, a1), [x2, y2] = P(cx, cy, r, a2); const large = ((a2 - a1) % 360 + 360) % 360 > 180 ? 1 : 0;
+    this.path(`M${f2(x1)},${f2(y1)} A${r},${r} 0 ${large},0 ${f2(x2)},${f2(y2)}`, 'none', c, 1.5);
+    if (label) { const [lx, ly] = P(cx, cy, lr || r + 16, (a1 + a2) / 2); this.text(lx, ly + 4.5, label, c, size); }
+  }
+  ra(x, y, a1, a2, k = 11, c = C.tinta) { const p1 = P(x, y, k, a1), p2 = P(x, y, k, a2); this.poly([p1, [p1[0] + p2[0] - x, p1[1] + p2[1] - y], p2], 'none', c, 1.1, null, false); }
+  svg() {
+    const defs = [...this.cols].map(c => `<marker id="${this.id}${c.slice(1)}" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="${c}"/></marker>`).join('');
+    return `<svg viewBox="0 0 ${this.w} ${this.h}" xmlns="http://www.w3.org/2000/svg"><defs>${defs}</defs>${this.el.join('')}</svg>`;
+  }
+}
+G.n = 0;
+
+/* ---------------------------------------------------------------- figuras */
+// triángulo rectángulo: base a (horizontal), altura b (vertical, a la derecha). Ángulo α en el vértice izquierdo.
+function figTri(a, b, o = {}) {
+  const g = new G(600, 320);
+  let s = Math.min(380 / a, 220 / b), px = a * s, py = b * s, distorsion = false;
+  if (px < 90) { px = 90; distorsion = true; } if (py < 45) { py = 45; distorsion = true; }
+  const x0 = (600 - px) / 2 - 40, y0 = 268;
+  const A = [x0, y0], B = [x0 + px, y0], Cc = [x0 + px, y0 - py];
+  g.poly([A, B, Cc], 'rgba(0,90,156,.07)');
+  g.line(...A, ...B, o.cA || C.azul, 3); g.line(...B, ...Cc, o.cB || C.rojo, 3); g.line(...A, ...Cc, o.cC || C.verde, 3);
+  g.ra(...B, 180, 90, 12);
+  g.dim(...A, ...B, -20, o.la, o.cA || C.azul, 14);
+  g.dim(...B, ...Cc, -22, o.lb, o.cB || C.rojo, 14);
+  const ux = px / Math.hypot(px, py), uy = py / Math.hypot(px, py);
+  g.text((A[0] + Cc[0]) / 2 - uy * 16, (A[1] + Cc[1]) / 2 - ux * 16, o.lc || '', o.cC || C.verde, 14, 'end');
+  if (o.alfa) { const a1 = atan(py / px); if (a1 < 18) { g.ang(...A, 52, 0, a1, null, C.tinta); g.text(A[0] - 10, A[1] + 5, o.alfa, C.tinta, 14, 'end'); } else g.ang(...A, 52, 0, a1, o.alfa, C.tinta, 72, 14); }
+  if (o.extra) o.extra(g, { A, B, C: Cc });
+  return pack(g, distorsion);
+}
+function pack(g, distorsion) { return g.svg() + (distorsion ? '<div class="esc">dibujo sin escala</div>' : ''); }
+
+function figRect(w, h, lw, lh, ld) {
+  const g = new G(600, 300); const s = Math.min(420 / w, 200 / h); let pw = w * s, ph = h * s, dist = false; if (ph < 50) { ph = 50; dist = true; }
+  const x0 = (600 - pw) / 2, y0 = 40 + (220 - ph) / 2;
+  g.rect(x0, y0, pw, ph, C.mad, C.madL, 2); g.line(x0, y0 + ph, x0 + pw, y0, C.verde, 2.4, { dash: '7 4' });
+  g.dim(x0, y0 + ph, x0 + pw, y0 + ph, -20, lw, C.azul, 14); g.dim(x0 + pw, y0 + ph, x0 + pw, y0, -20, lh, C.rojo, 14);
+  g.text(x0 + pw / 2 - 10, y0 + ph / 2 - 8, ld, C.verde, 15, 'end');
+  return pack(g, dist);
+}
+
+function figArmario(H, Fd, T) {
+  const g = new G(600, 340); const s = 270 / T; const top = 30, fl = top + T * s; const w = Fd * s, h = H * s;
+  g.line(20, top, 580, top, C.gris, 3); g.text(26, top - 8 + 22, 'techo', C.gris, 12, 'start', 600);
+  g.line(20, fl, 580, fl, C.gris, 3); g.text(26, fl + 16, 'suelo', C.gris, 12, 'start', 600);
+  const pv = [220, fl], cur = Math.atan2(-h, -w), rot = -Math.PI / 2 - cur;
+  const R = (x, y) => [pv[0] + x * Math.cos(rot) - y * Math.sin(rot), pv[1] + x * Math.sin(rot) + y * Math.cos(rot)];
+  g.poly([R(0, 0), R(-w, 0), R(-w, -h), R(0, -h)], 'rgba(211,84,0,.10)', C.nar, 1.6, '6 4');
+  const d = Math.hypot(w, h); g.line(pv[0], pv[1], pv[0], pv[1] - d, C.verde, 2.4);
+  g.text(pv[0] - 10, fl - d / 2, 'D = ?', C.verde, 14, 'end');
+  const x0 = 370; g.rect(x0, fl - h, w, h, C.mad, C.madL, 1.6);
+  g.dim(x0 + w, fl - h, x0 + w, fl, -16, N(H), C.azul, 13); g.dim(x0, fl, x0 + w, fl, -18, N(Fd), C.azul, 13);
+  g.dim(545, top, 545, fl, 0, N(T), C.tinta, 13);
+  return g.svg();
+}
+
+function figPata(H, v, lab) {
+  const g = new G(600, 330); const s = 220 / H; const t = 70, fl = t + H * s; const dx = Math.max(v * s, 14);
+  g.rect(110, t - 22, 380, 22, C.mad, C.madL); g.line(60, fl, 540, fl, C.gris, 3);
+  for (const [x0, sg] of [[170, -1], [430, 1]]) { g.line(x0, t, x0 + sg * dx, fl, C.madD, 15); g.line(x0, t, x0 + sg * dx, fl, C.madL, 1); }
+  g.line(430, t, 430, fl, C.gris, 1.2, { dash: '6 4' });
+  const a = ((Math.atan2(-(fl - t), dx) / D2R) + 360) % 360; g.ang(430, t, 90, 270, a, null, C.tinta); g.text(422, t + 108, lab.a, C.tinta, 14, 'end');
+  g.dim(510, t, 510, fl, 0, lab.h, C.azul, 13); g.dim(430, fl, 430 + dx, fl, -18, lab.v, C.rojo, 13);
+  g.text(300, 160, lab.l || '', C.verde, 14);
+  return pack(g, v * s < 14);
+}
+
+function figEscalera(lab) {
+  const g = new G(600, 345); const x0 = 120, y0 = 290, h = 74, c = 46, n = 5; const prof = [[x0, y0]];
+  for (let k = 0; k < n; k++) { const x = x0 + h * k; prof.push([x, y0 - c * (k + 1)]); if (k < n - 1) prof.push([x + h, y0 - c * (k + 1)]); }
+  const top = y0 - c * n, xe = x0 + h * (n - 1);
+  g.poly(prof.concat([[xe, y0]]), C.mad); g.poly(prof, 'none', C.madL, 2.2, null, false); g.rect(xe, top, 170, 20, '#e3e8ee', C.gris);
+  g.line(70, y0, x0, y0, C.gris, 3);
+  const N1 = [x0, y0 - c], K = [x0 + h, y0 - c], N2 = [x0 + h, y0 - 2 * c];
+  g.poly([N1, K, N2], 'rgba(211,84,0,.25)', C.nar, 1.6);
+  g.line(N1[0] - 15, N1[1] + 15 * c / h, xe + 30, top - 30 * c / h, C.verde, 1.6, { dash: '8 4' });
+  g.ang(...N1, 40, 0, atan(c / h), lab.a || 'α', C.tinta, 58, 13);
+  g.dim(...N1, ...K, -14, lab.h || 'h', C.azul, 13); g.dim(...K, ...N2, -14, lab.c || 'c', C.rojo, 13);
+  g.dim(98, y0, 98, top, 0, lab.H || 'H', C.tinta, 14);
+  if (lab.p) g.text((N1[0] + N2[0]) / 2 - 8, (N1[1] + N2[1]) / 2 - 10, lab.p, C.verde, 13, 'end');
+  if (lab.rec) g.dim(x0, y0, xe, y0, -22, lab.rec, C.azul, 12.5);
+  if (lab.txt) lab.txt.forEach((t, i) => g.text(440, 170 + 22 * i, t, C.tinta, 13, 'start', 600));
+  return g.svg();
+}
+
+function figMarcoN(n, lab) {
+  const g = new G(600, 320); const cx = 170, cy = 165, R = 130, w = 26; const Ri = R - w / cos(180 / n); const off = 90 - 180 / n;
+  const out = [], inn = []; for (let k = 0; k < n; k++) { out.push(P(cx, cy, R, off + 360 * k / n)); inn.push(P(cx, cy, Ri, off + 360 * k / n)); }
+  g.poly(out, C.mad, C.madL, 1.6); g.poly(inn, '#fff', C.madL, 1.6);
+  g.poly([out[0], out[1], inn[1], inn[0]], 'rgba(211,84,0,.30)', C.nar, 2);
+  for (let k = 0; k < n; k++) g.line(...inn[k], ...out[k], C.madL, 1.4);
+  // pieza suelta
+  const half = 180 / n, ww = 50, e = ww * tan(half), Li = 140; const x1 = 400, x2 = x1 + Li, yb = 230, yt = yb - ww;
+  g.poly([[x1, yb], [x2, yb], [x2 + e, yt], [x1 - e, yt]], 'rgba(211,84,0,.18)', C.nar, 2);
+  g.line(x1, yb, x1, yt - 12, C.gris, 1.2, { dash: '5 3' });
+  g.ang(x1, yb, 34, 90, 90 + half, null, C.tinta); g.text(x1 - 14, yt + 6, lab.corte, C.tinta, 13, 'end');
+  if (lab.li) g.dim(x1, yb, x2, yb, -16, lab.li, C.azul, 12.5);
+  if (lab.le) g.dim(x1 - e, yt, x2 + e, yt, 16, lab.le, C.azul, 12.5);
+  if (lab.w) g.dim(x2 + e + 14, yb, x2 + e + 14, yt, 0, lab.w, C.tinta, 13);
+  g.text(170, 315, n + ' lados', C.tinta, 13, 'middle', 600);
+  return g.svg();
+}
+
+function figMarcoRect(a, b, w, lab) {
+  const g = new G(600, 320); const s = Math.min(300 / (a + 2 * w), 240 / (b + 2 * w)); const W = (a + 2 * w) * s, Hh = (b + 2 * w) * s, ww = w * s;
+  const x0 = (600 - W) / 2 - 30, y0 = (320 - Hh) / 2;
+  g.rect(x0, y0, W, Hh, C.mad, C.madL, 1.6); g.rect(x0 + ww, y0 + ww, W - 2 * ww, Hh - 2 * ww, '#fff', C.madL, 1.6);
+  [[x0, y0, x0 + ww, y0 + ww], [x0 + W, y0, x0 + W - ww, y0 + ww], [x0, y0 + Hh, x0 + ww, y0 + Hh - ww], [x0 + W, y0 + Hh, x0 + W - ww, y0 + Hh - ww]].forEach(q => g.line(...q, C.madL, 1.4));
+  g.poly([[x0, y0], [x0 + W, y0], [x0 + W - ww, y0 + ww], [x0 + ww, y0 + ww]], 'rgba(211,84,0,.28)', C.nar, 1.8);
+  g.dim(x0 + ww, y0 + Hh - ww, x0 + W - ww, y0 + Hh - ww, 16, lab.a, C.azul, 13);
+  g.dim(x0 + W - ww, y0 + Hh - ww, x0 + W - ww, y0 + ww, 16, lab.b, C.azul, 13);
+  g.dim(x0, y0, x0 + W, y0, 16, lab.le || '?', C.nar, 13);
+  g.dim(x0 + W, y0 + Hh, x0 + W, y0, -18, lab.le2 || '?', C.nar, 13);
+  g.dim(x0, y0 + Hh * 0.6, x0 + ww, y0 + Hh * 0.6, -14, lab.w, C.tinta, 12);
+  return g.svg();
+}
+
+function figPoligono(n, lab) {
+  const g = new G(600, 320); const cx = 190, cy = 160, a = 120, half = 180 / n, Rv = a / cos(half);
+  const v = []; for (let k = 0; k < n; k++) v.push(P(cx, cy, Rv, half + 360 * k / n));
+  g.poly(v, C.mad, C.madL, 1.8);
+  g.dim(cx + a, cy + 30, cx - a, cy + 30, 0, lab.W, C.azul, 13, 14);
+  const t1 = n === 6 ? 1 : (n === 8 ? 2 : 3), t2 = t1 - 1; // lado de arriba
+  g.dim(...v[t1], ...v[t2], -16, lab.lado, C.nar, 13);
+  const opp = (n / 2);
+  g.line(...v[opp], ...v[0], C.verde, 1.6, { dash: '7 4' }); g.text(v[0][0] + 10, v[0][1] - 4, lab.D, C.verde, 13, 'start');
+  g.line(cx, cy, ...v[0], C.tinta, 1); g.ang(cx, cy, 64, 0, half, null, C.tinta); g.text(cx + 78, cy - 12, F(half, 1) + '°', C.tinta, 11.5, 'start');
+  g.dot(cx, cy, C.tinta, 3);
+  g.text(410, 150, n + ' lados', C.tinta, 14, 'start', 600); g.text(410, 172, 'W entre caras', C.azul, 13, 'start', 600); g.text(410, 194, 'D entre vértices', C.verde, 13, 'start', 600);
+  return g.svg();
+}
+
+function figArco(c, f, lab) {
+  const g = new G(600, 340); let ratio = f / c; const dist = ratio < 0.12; if (ratio < 0.12) ratio = 0.12; if (ratio > 0.5) ratio = 0.5;
+  const c2 = 200, ff = 400 * ratio, R = (c2 * c2 + ff * ff) / (2 * ff); const yc = 70 + ff, cx = 300, cyy = yc - ff + R;
+  g.path(`M100,${f2(yc)} A${f2(R)},${f2(R)} 0 0,1 500,${f2(yc)} Z`, C.mad, C.madL, 2.2);
+  const vis = Math.min(cyy, 320);
+  if (cyy < 330) { g.poly([[cx, cyy], [cx, yc], [500, yc]], 'rgba(30,132,73,.12)'); g.line(cx, cyy, 500, yc, C.azul, 2); g.cross(cx, cyy, C.tinta, 7); }
+  else { g.line(cx, yc, cx, 325, C.tinta, 1.2, { dash: '6 4' }); g.line(500, yc, 500 - (200 / R) * (325 - yc) * (R / (cyy - yc)), 325, C.azul, 1.4, { dash: '6 4' }); g.text(cx - 8, 322, 'el centro queda más abajo', C.tinta, 11, 'end', 600); }
+  g.line(cx, Math.min(cyy, 330), cx, yc, C.tinta, 1.4, { dash: '6 4' }); g.line(cx, yc, cx, yc - ff, C.nar, 3.2);
+  g.text(cx + 10, yc - ff / 2 + 5, lab.f, C.nar, 14, 'start');
+  g.dim(100, yc, 500, yc, 0, null, C.tinta, 13);
+  g.text(400, yc + 20, lab.c, C.tinta, 13);
+  if (lab.R) g.text(420, Math.min(yc + (cyy - yc) / 2 + 20, 300), lab.R, C.azul, 14, 'start');
+  return pack(g, dist);
+}
+
+function figEsquina90(lab) {
+  const g = new G(600, 320); const V = [400, 50], r = 190, Cc = [V[0] - r, V[1] + r];
+  g.path(`M40,50 L${Cc[0]},50 A${r},${r} 0 0,1 ${V[0]},${Cc[1]} L400,310 L40,310`, 'rgba(0,90,156,.07)', C.azul, 2.4);
+  g.line(Cc[0], 50, 400, 50, C.gris, 1.2, { dash: '6 4' }); g.line(400, 50, 400, Cc[1], C.gris, 1.2, { dash: '6 4' });
+  const Pp = P(...Cc, r, 45); g.line(412, 38, Cc[0] - 10, Cc[1] + 10, C.gris, .9, { dash: '7 3 1.5 3' });
+  g.line(...V, ...Pp, C.nar, 4.5, { cap: 'round' }); g.dot(...V, C.tinta, 4.5); g.dot(...Pp, C.nar, 4.5);
+  g.line(...Cc, Cc[0], 54, C.azul, 1.4, { a2: true }); g.text(Cc[0] - 10, 150, lab.r, C.azul, 15, 'end');
+  g.cross(...Cc, C.azul);
+  g.text(410, 44, 'V', C.tinta, 14, 'start'); g.text(V[0] + 14, V[1] + 40, lab.d, C.nar, 15, 'start');
+  g.text(450, 140, 'esquina de 90°', C.tinta, 13, 'start', 600); g.text(450, 160, 'd por la bisectriz', C.nar, 12.5, 'start', 600);
+  return g.svg();
+}
+
+function figEsquinaPieza(W, H, esq, r, d) {
+  const g = new G(600, 330); const s = Math.min(380 / W, 230 / H); const pw = W * s, ph = H * s; const x0 = 90, y0 = 280; const rr = Math.max(r * s, 14);
+  const X = x => x0 + x * s, Y = y => y0 - y * s;
+  // contorno con una esquina redondeada
+  const pts = { bl: [X(0), Y(0)], br: [X(W), Y(0)], tr: [X(W), Y(H)], tl: [X(0), Y(H)] };
+  const ord = ['bl', 'br', 'tr', 'tl']; let d0 = '';
+  ord.forEach((k, i) => {
+    const p = pts[k]; if (k === esq) {
+      const prev = pts[ord[(i + 3) % 4]], next = pts[ord[(i + 1) % 4]];
+      const u1 = [(prev[0] - p[0]), (prev[1] - p[1])], l1 = Math.hypot(...u1), u2 = [(next[0] - p[0]), (next[1] - p[1])], l2 = Math.hypot(...u2);
+      const a = [p[0] + u1[0] / l1 * rr, p[1] + u1[1] / l1 * rr], b = [p[0] + u2[0] / l2 * rr, p[1] + u2[1] / l2 * rr];
+      d0 += (i ? 'L' : 'M') + f2(a[0]) + ',' + f2(a[1]) + ` A${f2(rr)},${f2(rr)} 0 0,${['bl', 'tr'].includes(k) ? 0 : 0} ` + f2(b[0]) + ',' + f2(b[1]) + ' ';
+    } else d0 += (i ? 'L' : 'M') + f2(p[0]) + ',' + f2(p[1]) + ' ';
+  });
+  g.path(d0 + 'Z', 'rgba(0,90,156,.07)', C.azul, 2.2);
+  g.line(x0 - 30, y0, x0 + pw + 40, y0, C.gris, 1, { a2: true }); g.line(x0, y0 + 25, x0, y0 - ph - 30, C.gris, 1, { a2: true });
+  g.text(x0 + pw + 44, y0 + 5, 'X', C.gris, 12, 'start'); g.text(x0 - 6, y0 - ph - 32, 'Y', C.gris, 12, 'end'); g.text(x0 - 6, y0 + 16, 'X0 Y0', C.tinta, 11, 'end', 600, true);
+  const p = pts[esq]; const sx = esq.includes('r') ? -1 : 1, sy = esq.includes('t') ? 1 : -1; // hacia dentro (en pantalla)
+  const cpx = [p[0] + sx * rr, p[1] + sy * rr]; const Pp = [cpx[0] - sx * rr / Math.SQRT2, cpx[1] - sy * rr / Math.SQRT2];
+  g.line(...p, ...Pp, C.nar, 4, { cap: 'round' }); g.dot(...p, C.tinta, 3.5);
+  g.text(cpx[0] + sx * 14, cpx[1] + (sy < 0 ? -10 : 18), 'd = ' + F(d, 3), C.nar, 13, sx < 0 ? 'end' : 'start');
+  g.dim(X(0), Y(0), X(W), Y(0), -22, N(W), C.azul, 12.5); g.dim(X(0), Y(0), X(0), Y(H), 30, N(H), C.azul, 12.5);
+  return g.svg();
+}
+
+function figEsquinaTheta(th, d) {
+  const g = new G(600, 330); const half = th / 2, rp = th < 90 ? 70 : 110; const VC = rp / sin(half), VT = rp / tan(half);
+  const V = [300, 36]; const bis = 270; // bisectriz hacia abajo
+  const Cc = P(...V, VC, bis), T1 = P(...V, VT, bis + half), T2 = P(...V, VT, bis - half);
+  const E1 = P(...V, VT + 260, bis + half), E2 = P(...V, VT + 260, bis - half);
+  g.line(...V, ...E1, C.gris, 1.2, { dash: '6 4' }); g.line(...V, ...E2, C.gris, 1.2, { dash: '6 4' });
+  g.line(...T1, ...E1, C.azul, 2.4); g.line(...T2, ...E2, C.azul, 2.4);
+  g.path(`M${f2(T1[0])},${f2(T1[1])} A${rp},${rp} 0 0,0 ${f2(T2[0])},${f2(T2[1])}`, 'none', C.azul, 2.4);
+  const Pp = P(...V, VC - rp, bis); g.line(...V, ...Pp, C.nar, 4.5, { cap: 'round' }); g.dot(...V, C.tinta, 4); g.dot(...Pp, C.nar, 4);
+  g.line(...Cc, ...T1, C.azul, 1.2); g.ra(...T1, bis + half + 180, bis + half - 90, 9); g.cross(...Cc, C.azul, 7);
+  g.ang(...V, 46, bis - half, bis + half, null, C.tinta); { const q = P(...V, 64, bis + half * 0.6); g.text(q[0], q[1] + 5, th + '°', C.tinta, 14); }
+  g.text(V[0] + 10, V[1] - 6, 'V', C.tinta, 14, 'start'); g.text((V[0] + Pp[0]) / 2 + 10, (V[1] + Pp[1]) / 2 + 6, 'd', C.nar, 15, 'start');
+  g.text((Cc[0] + T1[0]) / 2 - 6, (Cc[1] + T1[1]) / 2 - 6, 'r', C.azul, 15, 'end');
+  return g.svg();
+}
+
+function figReparto(tipo, n, lab) {
+  const g = new G(600, 320);
+  if (tipo === 'barandilla') {
+    const L = 60, R = 540, y1 = 70, y2 = 260; g.rect(L - 20, 40, 20, 250, C.madD, C.madL); g.rect(R, 40, 20, 250, C.madD, C.madL);
+    g.rect(L, 60, R - L, 12, C.mad, C.madL); g.rect(L, 250, R - L, 12, C.mad, C.madL);
+    const nn = Math.min(n, 14), bw = 10, sp = (R - L - nn * bw) / (nn + 1);
+    for (let k = 0; k < nn; k++) g.rect(L + sp + k * (sp + bw), 72, bw, 178, C.madD, C.madL, 1);
+    g.dim(L, 290, R, 290, 0, lab.L, C.azul, 13); g.dim(L, 120, L + sp, 120, 0, null, C.nar, 12); g.line(L + sp / 2, 50, L + sp / 2, 116, C.nar, 0.9); g.text(L + sp / 2 + 4, 46, lab.s, C.nar, 13, 'start');
+    if (n > 14) g.text(420, 30, 'dibujo con menos barrotes', C.sub, 11, 'middle', 400);
+  } else if (tipo === 'cajonera') {
+    const L = 180, R = 420, T = 30, B = 300; g.rect(L - 14, T - 14, R - L + 28, B - T + 28, C.madD, C.madL);
+    g.rect(L, T, R - L, B - T, '#fff', C.madL); const hol = 6, fr = (B - T - (n + 1) * hol) / n;
+    for (let k = 0; k < n; k++) { const y = T + hol + k * (fr + hol); g.rect(L + 4, y, R - L - 8, fr, C.mad, C.madL, 1.4); g.rect(300 - 18, y + fr / 2 - 3, 36, 6, C.gris); }
+    g.dim(R + 30, T, R + 30, B, 0, lab.H, C.azul, 13); g.text(L - 24, T + hol + 4, lab.h, C.nar, 12, 'end'); g.text(300, T + hol + fr / 2 - 10, lab.f, C.nar, 13);
+  } else {
+    const L = 160, R = 400, T = 30, B = 300; g.rect(L - 15, T, 15, B - T, C.mad, C.madL); g.rect(R, T, 15, B - T, C.mad, C.madL);
+    g.rect(L - 15, T - 15, R - L + 30, 15, C.mad, C.madL); g.rect(L - 15, B, R - L + 30, 15, C.mad, C.madL);
+    const e = 8, s = (B - T - n * e) / (n + 1); let y = T;
+    for (let k = 0; k <= n; k++) { g.dim(R + 20, y, R + 20, y + s, 0, null, C.nar, 12); g.text(R + 30, y + s / 2 + 5, k === 0 ? lab.s : 's', C.nar, 12, 'start'); y += s; if (k < n) { g.rect(L, y, R - L, e, C.madD, C.madL); y += e; } }
+    g.dim(L - 35, B, L - 35, T, 0, lab.H, C.tinta, 13); g.text(L + 12, T + s + e + 18, lab.e, C.tinta, 12, 'start');
+  }
+  return g.svg();
+}
+
+function figCNC(x1, y1, x2, y2, lab) {
+  const g = new G(600, 340); const xs = [0, x1, x2], ys = [0, y1, y2];
+  const mnx = Math.min(...xs), mxx = Math.max(...xs), mny = Math.min(...ys), mxy = Math.max(...ys);
+  const s = Math.min(460 / Math.max(mxx - mnx, 1), 240 / Math.max(mxy - mny, 1));
+  const ox = 70 - mnx * s + (460 - (mxx - mnx) * s) / 2, oy = 290 + mny * s - (240 - (mxy - mny) * s) / 2;
+  const X = x => ox + x * s, Y = y => oy - y * s;
+  g.line(Math.min(X(0), 40), Y(0), 580, Y(0), C.gris, 1.2, { a2: true }); g.line(X(0), Math.max(Y(0), 315), X(0), 18, C.gris, 1.2, { a2: true });
+  g.text(578, Y(0) + 16, 'X', C.gris, 13, 'end'); g.text(X(0) - 10, 26, 'Y', C.gris, 13, 'end');
+  const A = [X(x1), Y(y1)], B = [X(x2), Y(y2)];
+  g.line(A[0], A[1], B[0], A[1], C.gris, 1.1, { dash: '5 4' }); g.line(B[0], A[1], B[0], B[1], C.gris, 1.1, { dash: '5 4' });
+  g.line(...A, ...B, C.nar, 3, { a2: true }); g.dot(...A, C.tinta, 4); g.dot(...B, C.tinta, 4);
+  if (lab.dx) g.dim(A[0], A[1], B[0], A[1], (y2 >= y1 ? -1 : 1) * (x2 >= x1 ? 1 : -1) * 18, lab.dx, C.azul, 12.5);
+  if (lab.dy) g.dim(B[0], A[1], B[0], B[1], (x2 >= x1 ? -1 : 1) * (y2 >= y1 ? 1 : -1) * 18, lab.dy, C.rojo, 12.5);
+  const a2 = ((Math.atan2(y2 - y1, x2 - x1) / D2R) + 360) % 360;
+  g.line(A[0], A[1], A[0] + 50, A[1], C.tinta, 1, { dash: '3 3' });
+  if (lab.alfa) { if (a2 > 180) { g.ang(...A, 30, 0, a2, null, C.tinta); g.text(A[0], A[1] - 40, lab.alfa, C.tinta, 13); } else g.ang(...A, 40, 0, a2, lab.alfa, C.tinta, 60, 13); }
+  const lp = (Q, ang, t, d) => { const [x, y] = P(Q[0], Q[1], d, ang); const cs = cos(ang); g.text(x, y + 5, t, C.tinta, 12.5, cs > 0.3 ? 'start' : cs < -0.3 ? 'end' : 'middle', 700, true); };
+  lp(A, a2 + 180 + (a2 > 180 ? -25 : 25), lab.pa, 22); lp(B, a2, lab.pb, 18);
+  const mx = (A[0] + B[0]) / 2, my = (A[1] + B[1]) / 2; g.text(mx - 10, my - 10, lab.L || '', C.nar, 13.5, 'end');
+  return g.svg();
+}
+
+/* ================================================================ generadores */
+// q: pregunta { l: etiqueta, v: valor, u: unidad, d: decimales que se piden, t: tolerancia }
+function q(l, v, u = 'mm', d = 1, t = null) {
+  if (t === null) t = d === 0 ? 0 : d === 1 ? Math.max(0.11, Math.abs(v) * 0.0005) : d === 2 ? 0.02 : 0.011;
+  return { l, v, u, d, t };
+}
+const TEMAS = [
+  { k: 'pit', n: 'Pitágoras' }, { k: 'trig', n: 'Trigonometría' }, { k: 'esc', n: 'Escaleras' }, { k: 'ing', n: 'Ingletes y polígonos' },
+  { k: 'arc', n: 'Arcos' }, { k: 'esq', n: 'Radio de esquina' }, { k: 'rep', n: 'Repartos' }, { k: 'cnc', n: 'Recta en la CNC' },
+  { k: 'cub', n: 'Cubiertas y cerchas' }, { k: 'icp', n: 'Ingletes compuestos' }, { k: 'arm', n: 'Arcos de carpintería' },
+];
+
+const GEN = {
+  pit: {
+    1() {
+      if (RND() < .5) {
+        const a = rs(400, 2440, 10), b = rs(300, Math.min(a, 1220), 10), d = sq(a * a + b * b);
+        return { e: `¿Cuánto mide la diagonal de un tablero de <b>${N(a)} × ${N(b)}</b> mm?`, fig: figRect(a, b, N(a), N(b), 'D = ?'),
+          qs: [q('Diagonal D', d)], pista: 'La diagonal es la hipotenusa de un triángulo rectángulo cuyos catetos son los dos lados del tablero.',
+          pasos: [cu(`D = √(${a}² + ${b}²) = √(${N(a * a)} + ${N(b * b)}) = √${N(a * a + b * b)} = ${F(d)} mm`)] };
+      }
+      const a = rs(250, 700, 10), b = rs(200, 600, 10), L = sq(a * a + b * b);
+      return { e: `Un jabalcón sujeta un estante: se apoya en la pared <b>${b}</b> mm por debajo del estante y lo toca a <b>${a}</b> mm de la pared. ¿Qué largo tiene el jabalcón, de punta a punta?`,
+        fig: figTri(a, b, { la: a, lb: b, lc: 'L = ?' }), qs: [q('Largo L', L)], pista: 'Los catetos son las distancias por la pared y por el estante. El jabalcón es la hipotenusa.',
+        pasos: [cu(`L = √(${a}² + ${b}²) = √(${N(a * a)} + ${N(b * b)}) = √${N(a * a + b * b)} = ${F(L)} mm`)] };
+    },
+    2() {
+      const trios = [[3, 4, 5], [5, 12, 13], [8, 15, 17], [7, 24, 25], [20, 21, 29]];
+      let a, c, b;
+      if (RND() < .5) { const t = pick(trios), k = pick([20, 25, 30, 40, 50]); [a, b, c] = [t[0] * k, t[1] * k, t[2] * k]; if (RND() < .5) [a, b] = [b, a]; }
+      else { c = rs(600, 2000, 10); a = rs(Math.round(c * .3 / 10) * 10, Math.round(c * .85 / 10) * 10, 10); b = sq(c * c - a * a); }
+      return { e: `La diagonal de un marco rectangular mide <b>${N(c)}</b> mm y uno de sus lados, <b>${N(a)}</b> mm. ¿Cuánto mide el otro lado?`,
+        fig: figRect(a, b, N(a), '?', 'D = ' + N(c)), qs: [q('Otro lado', b)], pista: 'Buscas un cateto: al cuadrado de la hipotenusa (la diagonal) le restas el cuadrado del lado que conoces.',
+        pasos: [cu(`b = √(${c}² − ${a}²) = √(${N(c * c)} − ${N(a * a)}) = √${N(c * c - a * a)} = ${F(b)} mm`)] };
+    },
+    3() {
+      const H = rs(1900, 2200, 10), Fd = rs(450, 650, 10), T = rs(H + 60, H + 260, 10), D = sq(H * H + Fd * Fd), Fm = sq(T * T - H * H);
+      const cabe = D <= T;
+      return { e: `Un armario de <b>${N(H)}</b> mm de alto y <b>${Fd}</b> mm de fondo se monta tumbado en una habitación de <b>${N(T)}</b> mm de techo. ¿Cuánto mide la diagonal del costado? ¿Qué fondo máximo podría tener el armario para poder levantarlo?`,
+        fig: figArmario(H, Fd, T), qs: [q('Diagonal del costado', D), q('Fondo máximo', Fm)],
+        pista: 'Al levantar el armario, la esquina de arriba gira con un radio igual a la diagonal del costado. Para el fondo máximo, la diagonal tiene que medir como mucho la altura del techo: busca el cateto.',
+        pasos: [cu(`D = √(${H}² + ${Fd}²) = √${N(H * H + Fd * Fd)} = ${F(D)} mm`, `${F(D)} ${cabe ? '≤' : '&gt;'} ${T} → ${cabe ? 'cabe' : 'no cabe'}`), cu(`fondo máximo = √(${T}² − ${H}²) = √${N(T * T - H * H)} = ${F(Fm)} mm`)] };
+    },
+  },
+  trig: {
+    1() {
+      if (RND() < .4) {
+        const n = pick([4, 5, 6, 7, 8, 10, 12]), a = atan(1 / n);
+        return { e: `Las colas de milano se trazan con una pendiente de <b>1:${n}</b>. ¿Cuántos grados son?`, fig: figTri(n * 40, 40, { la: n, lb: 1, lc: '', alfa: 'α = ?' }),
+          qs: [q('Ángulo α', a, '°')], pista: `Por cada ${n} que avanza, sube 1: el opuesto es 1 y el contiguo ${n}. Usa la tangente inversa.`, pasos: [cu(`α = tan⁻¹(1 / ${n}) = tan⁻¹ ${F(1 / n, 4)} = ${F(a, 2)}°`)] };
+      }
+      const a = rs(600, 3000, 50), b = rs(Math.round(a * .03 / 5) * 5 || 20, Math.round(a * .25 / 5) * 5, 5), p = b / a * 100, al = atan(b / a);
+      return { e: `Una rampa avanza <b>${N(a)}</b> mm y sube <b>${b}</b> mm. ¿Qué pendiente tiene, en % y en grados?`, fig: figTri(a, b, { la: N(a), lb: b, lc: '', alfa: 'α = ?' }),
+        qs: [q('Pendiente', p, '%', 1, 0.06), q('Ángulo α', al, '°')], pista: 'La pendiente es lo que sube dividido entre lo que avanza, por 100. El ángulo es la tangente inversa de esa división.',
+        pasos: [cu(`pendiente = ${b} / ${a} · 100 = ${F(p, 2)} %`), cu(`α = tan⁻¹(${b} / ${a}) = tan⁻¹ ${F(b / a, 4)} = ${F(al, 2)}°`)] };
+    },
+    2() {
+      const L = rs(300, 1500, 10), a = rs(8, 70, 1), h = L * sin(a), w = L * cos(a);
+      return { e: `Un tablero de <b>${N(L)}</b> mm se apoya inclinado a <b>${a}°</b> sobre el suelo. ¿A qué altura llega y cuánto ocupa en el suelo, en horizontal?`,
+        fig: figTri(w, h, { la: '?', lb: '?', lc: 'L = ' + N(L), alfa: a + '°' }), qs: [q('Altura', h), q('En horizontal', w)],
+        pista: 'El tablero es la hipotenusa. La altura es el cateto opuesto al ángulo (seno) y lo que ocupa en el suelo, el contiguo (coseno).',
+        pasos: [cu(`altura = ${L} · sen ${a}° = ${L} · ${F(sin(a), 4)} = ${F(h)} mm`), cu(`horizontal = ${L} · cos ${a}° = ${L} · ${F(cos(a), 4)} = ${F(w)} mm`), `Comprobación: √(${F(h)}² + ${F(w)}²) ≈ ${L}`] };
+    },
+    3() {
+      if (RND() < .55) {
+        const H = rs(400, 760, 10), v = rs(30, 120, 5), a = atan(v / H), L = sq(H * H + v * v);
+        return { e: `Las patas de una mesa de <b>${H}</b> mm de alto se abren <b>${v}</b> mm hacia fuera en el suelo. ¿A qué ángulo (respecto a la vertical) se cortan arriba y abajo? ¿Qué largo tienen?`,
+          fig: figPata(H, v, { a: 'α = ?', h: H, v: v, l: '' }), qs: [q('Ángulo α', a, '°'), q('Largo de la pata', L)],
+          pista: 'Mira el triángulo con la vertical: el vuelo es el cateto opuesto al ángulo α y la altura, el contiguo. El largo es la hipotenusa.',
+          pasos: [cu(`α = tan⁻¹(${v} / ${H}) = tan⁻¹ ${F(v / H, 4)} = ${F(a, 2)}°`), cu(`largo = √(${H}² + ${v}²) = ${F(L)} mm`)] };
+      }
+      const L = rs(500, 1100, 10), a = rs(6, 25, 1), r = L * sin(a), h = L * cos(a);
+      return { e: `El respaldo de un banco mide <b>${L}</b> mm y va inclinado <b>${a}°</b> respecto a la vertical. ¿Cuánto se retrasa la parte de arriba? ¿Qué altura tiene el respaldo?`,
+        fig: figTri(r, h, { la: 'retraso = ?', lb: 'altura = ?', lc: 'L = ' + L, extra: (g, p) => { const ah = (Math.atan2(p.C[1] - p.A[1], p.A[0] - p.C[0]) / D2R + 360) % 360; g.ang(...p.C, 46, ah, 270, a + '°', C.tinta, 66, 13); } }),
+        qs: [q('Retraso', r), q('Altura', h)],
+        pista: 'El respaldo es la hipotenusa y el ángulo se mide desde la vertical: el retraso es el cateto opuesto (seno) y la altura, el contiguo (coseno).',
+        pasos: [cu(`retraso = ${L} · sen ${a}° = ${F(r)} mm`), cu(`altura = ${L} · cos ${a}° = ${F(h)} mm`)] };
+    },
+  },
+  esc: {
+    1() {
+      const n = ri(12, 18), c = rs(160, 185, 1), H = n * c, h = 630 - 2 * c;
+      return { e: `Una escalera salva <b>${N(H)}</b> mm con <b>${n}</b> contrahuellas iguales. ¿Cuánto mide cada contrahuella? ¿Qué huella da la regla de Blondel (2c + h = 630)?`,
+        fig: figEscalera({ c: 'c = ?', h: 'h = ?', H: 'H = ' + N(H) }), qs: [q('Contrahuella c', c), q('Huella h', h)],
+        pista: 'Reparte la altura entre el número de contrahuellas. Después despeja h en 2c + h = 630.',
+        pasos: [cu(`c = ${H} / ${n} = ${F(c)} mm`), cu(`h = 630 − 2 · ${F(c)} = ${F(h)} mm`)] };
+    },
+    2() {
+      const H = rs(2400, 3100, 10), n = Math.round(H / 175), c = H / n, h = 630 - 2 * c, rec = (n - 1) * h, a = atan(c / h), hr = Math.round(h / 5) * 5;
+      return { e: `Calcula una escalera para <b>${N(H)}</b> mm de altura, con contrahuellas de unos 175 mm: número de contrahuellas (redondea H / 175), contrahuella exacta, huella por Blondel (630), recorrido en planta y ángulo.`,
+        fig: figEscalera({ c: 'c', h: 'h', H: 'H = ' + N(H), rec: 'recorrido = ?' }),
+        qs: [q('Contrahuellas n', n, '', 0), q('Contrahuella c', c), Object.assign(q('Huella h', h), { alt: [hr, Math.round(h)] }), Object.assign(q('Recorrido', rec, 'mm', 1, Math.max(0.6, rec * 0.0006)), { alt: [(n - 1) * hr, (n - 1) * Math.round(h)] }), Object.assign(q('Ángulo α', a, '°'), { alt: [atan(c / hr), atan(c / Math.round(h))] })],
+        pista: 'Hay una huella menos que contrahuellas: la última contrahuella llega al piso de arriba. El ángulo sale de tan α = c / h.',
+        pasos: [cu(`${H} / 175 = ${F(H / 175, 2)} → n = ${n}`), cu(`c = ${H} / ${n} = ${F(c, 2)} mm`), cu(`h = 630 − 2 · ${F(c, 2)} = ${F(h, 2)} mm`), cu(`recorrido = (${n} − 1) · ${F(h, 2)} = ${F(rec)} mm`), cu(`α = tan⁻¹(${F(c, 2)} / ${F(h, 2)}) = ${F(a, 2)}°`), `En el taller se suele redondear la huella a ${hr} mm: también vale, con recorrido ${F((n - 1) * hr)} mm y α = ${F(atan(c / hr), 2)}°.`] };
+    },
+    3() {
+      const c = rs(165, 200, 1), h = rs(220, 300, 5), n = ri(10, 17), a = atan(c / h), p = sq(c * c + h * h), ln = (n - 1) * p;
+      return { e: `Una escalera tiene <b>${n}</b> contrahuellas de <b>${c}</b> mm y huellas de <b>${h}</b> mm. ¿Qué ángulo tiene? ¿Cuánto mide cada peldaño en diagonal? ¿Y la línea de narices completa?`,
+        fig: figEscalera({ c: 'c = ' + c, h: 'h = ' + h, H: 'H', p: 'paso = ?' }), qs: [q('Ángulo α', a, '°'), q('Paso (diagonal)', p), q('Línea de narices', ln, 'mm', 1, Math.max(0.6, ln * 0.0006))],
+        pista: 'Cada peldaño es un triángulo rectángulo de catetos h y c. La línea de narices tiene n − 1 pasos.',
+        pasos: [cu(`α = tan⁻¹(${c} / ${h}) = ${F(a, 2)}°`), cu(`paso = √(${h}² + ${c}²) = ${F(p, 2)} mm`), cu(`línea de narices = (${n} − 1) · ${F(p, 2)} = ${F(ln)} mm`)] };
+    },
+  },
+  ing: {
+    1() {
+      if (RND() < .5) {
+        const n = pick([3, 5, 6, 8, 10, 12]);
+        return { e: `¿A qué ángulo (desde el corte a escuadra) se cortan las piezas de un marco regular de <b>${n}</b> lados?`, fig: figMarcoN(n, { corte: '?' }),
+          qs: [q('Corte', 180 / n, '°')], pista: 'Al dar la vuelta al marco se giran 360°. Cada unión gira 360° / n y ese giro se reparte entre las dos piezas.', pasos: [cu(`corte = 180° / ${n} = ${F(180 / n, 2)}°`)] };
+      }
+      const b = pick([100, 105, 110, 120, 130, 135, 140, 150, 160, 60, 70, 80, 85, 95]);
+      return { e: `Un rodapié recorre un rincón de <b>${b}°</b>. ¿A qué ángulo (desde el corte a escuadra) se corta cada una de las dos piezas?`,
+        fig: rincon(b),
+        qs: [q('Corte', (180 - b) / 2, '°')], pista: 'Con una esquina de β grados, cada pieza se corta a (180° − β) / 2. Compruébalo con 90°: sale 45°.', pasos: [cu(`corte = (180° − ${b}°) / 2 = ${F((180 - b) / 2, 2)}°`)] };
+    },
+    2() {
+      if (RND() < .5) {
+        const a = rs(200, 900, 10), b = rs(150, 700, 10), w = pick([30, 35, 40, 45, 50, 60, 70]);
+        return { e: `Un cuadro de <b>${a} × ${b}</b> mm (medidas por dentro) lleva un marco de listón de <b>${w}</b> mm de ancho, con ingletes a 45°. ¿Qué largo exterior tienen las piezas?`,
+          fig: figMarcoRect(a, b, w, { a: a, b: b, w: w }), qs: [q('Piezas largas', a + 2 * w), q('Piezas cortas', b + 2 * w)],
+          pista: 'L ext = L int + 2 · w · tan 45°, y tan 45° = 1.', pasos: [cu(`${a} + 2 · ${w} = ${a + 2 * w} mm`, `${b} + 2 · ${w} = ${b + 2 * w} mm`)] };
+      }
+      const n = pick([3, 5, 6, 8]), Li = rs(150, 500, 10), w = pick([30, 40, 45, 50, 60]), Le = Li + 2 * w * tan(180 / n);
+      return { e: `Un marco regular de <b>${n}</b> lados tiene <b>${Li}</b> mm de lado interior y listón de <b>${w}</b> mm. ¿Qué largo exterior tiene cada pieza?`,
+        fig: figMarcoN(n, { corte: F(180 / n, 1) + '°', li: 'L int = ' + Li, le: 'L ext = ?', w: 'w = ' + w }), qs: [q('Largo exterior', Le)],
+        pista: `El corte es 180° / ${n}. Cada extremo de la pieza añade w · tan(corte) en el canto de fuera.`,
+        pasos: [cu(`corte = 180° / ${n} = ${F(180 / n, 2)}°`), cu(`L ext = ${Li} + 2 · ${w} · tan ${F(180 / n, 2)}° = ${Li} + ${2 * w} · ${F(tan(180 / n), 4)} = ${F(Le)} mm`)] };
+    },
+    3() {
+      const n = pick([6, 8, 12]), W = rs(400, 1400, 50), half = 180 / n, l = W * tan(half), D = W / cos(half);
+      return { e: `Un tablero de mesa regular de <b>${n}</b> lados mide <b>${N(W)}</b> mm entre caras paralelas. ¿Cuánto mide el lado? ¿Y la medida entre vértices opuestos?`,
+        fig: figPoligono(n, { W: 'W = ' + N(W), lado: 'lado = ?', D: 'D = ?' }), qs: [q('Lado', l), q('Entre vértices D', D)],
+        pista: `Trabaja con el triángulo que va del centro a la mitad de un lado: el ángulo en el centro es 180° / ${n} = ${F(half, 1)}°, el cateto contiguo es W / 2 y el opuesto, medio lado.`,
+        pasos: [cu(`lado = ${W} · tan ${F(half, 1)}° = ${W} · ${F(tan(half), 4)} = ${F(l)} mm`), cu(`D = ${W} / cos ${F(half, 1)}° = ${W} / ${F(cos(half), 4)} = ${F(D)} mm`)] };
+    },
+  },
+  arc: {
+    1() {
+      const c = rs(400, 2000, 50), f = rs(Math.max(20, Math.round(c * .03 / 5) * 5), Math.round(c * .25 / 5) * 5, 5), R = c * c / (8 * f) + f / 2;
+      return { e: `Un arco tiene <b>${N(c)}</b> mm de cuerda y <b>${f}</b> mm de flecha. ¿Qué radio tiene?`, fig: figArco(c, f, { c: 'c = ' + N(c), f: 'f = ' + f, R: 'R = ?' }),
+        qs: [q('Radio R', R)], pista: 'R = c² / (8f) + f / 2. Sale de Pitágoras en el triángulo de catetos c/2 y R − f, con hipotenusa R.',
+        pasos: [cu(`R = ${c}² / (8 · ${f}) + ${f} / 2 = ${F(c * c / (8 * f), 2)} + ${F(f / 2, 2)} = ${F(R)} mm`)] };
+    },
+    2() {
+      const R = rs(300, 3000, 50), c = rs(Math.round(R * .4 / 10) * 10, Math.round(R * 1.6 / 10) * 10, 10), f = R - sq(R * R - c * c / 4);
+      return { e: `Un arco de radio <b>${N(R)}</b> mm tiene una cuerda de <b>${N(c)}</b> mm. ¿Cuánto mide la flecha? ¿A qué distancia de la cuerda está el centro?`,
+        fig: figArco(c, f, { c: 'c = ' + N(c), f: 'f = ?', R: 'R = ' + N(R) }), qs: [q('Flecha f', f), q('Centro a la cuerda (R − f)', R - f)],
+        pista: 'En el triángulo de la figura, R es la hipotenusa y c/2 un cateto: el otro cateto es R − f.',
+        pasos: [cu(`R − f = √(${R}² − ${c / 2}²) = √${N(R * R - c * c / 4)} = ${F(R - f, 2)} mm`), cu(`f = ${R} − ${F(R - f, 2)} = ${F(f)} mm`)] };
+    },
+    3() {
+      const c = rs(400, 1800, 50), f = rs(Math.max(30, Math.round(c * .05 / 5) * 5), Math.round(c * .3 / 5) * 5, 5), R = c * c / (8 * f) + f / 2, th = 2 * asin(c / 2 / R), L = Math.PI * R * th / 180;
+      return { e: `Hay que chapar el canto de un arco de <b>${N(c)}</b> mm de cuerda y <b>${f}</b> mm de flecha. Calcula el radio, el ángulo que abarca el arco y su largo.`,
+        fig: figArco(c, f, { c: 'c = ' + N(c), f: 'f = ' + f, R: 'R = ?' }), qs: [q('Radio R', R), q('Ángulo θ', th, '°'), q('Largo del arco', L)],
+        pista: 'Primero R = c² / (8f) + f / 2. El ángulo: θ = 2 · sen⁻¹(c / 2R). El largo: π · R · θ / 180.',
+        pasos: [cu(`R = ${c}² / (8 · ${f}) + ${f} / 2 = ${F(R, 2)} mm`), cu(`θ = 2 · sen⁻¹(${c / 2} / ${F(R, 2)}) = ${F(th, 2)}°`), cu(`largo = π · ${F(R, 2)} · ${F(th, 2)} / 180 = ${F(L)} mm`), `El arco tiene que medir algo más que la cuerda (${c}).`] };
+    },
+  },
+  esq: {
+    1() {
+      const r = pick([5, 6, 8, 10, 12, 15, 18, 20, 25, 30, 35, 40, 50]), d = r3(r * (Math.SQRT2 - 1));
+      return { e: `En una esquina de 90° redondeada mides con el calibre <b>d = ${F(d, 3)}</b> mm desde el vértice hasta el arco, por la bisectriz. ¿Qué radio tiene?`,
+        fig: figEsquina90({ r: 'r = ?', d: 'd = ' + F(d, 3) }), qs: [q('Radio r', d * (Math.SQRT2 + 1), 'mm', 1, 0.11)],
+        pista: 'V, los dos puntos de tangencia y el centro forman un cuadrado de lado r. Su diagonal mide r · √2 = d + r, así que r = d · (√2 + 1).',
+        pasos: [cu(`r = ${F(d, 3)} · (√2 + 1) = ${F(d, 3)} · 2.4142 = ${F(d * (Math.SQRT2 + 1), 3)} → R${r}`)] };
+    },
+    2() {
+      const W = rs(100, 260, 10), H = rs(60, 160, 10), r = pick([5, 8, 10, 12, 15, 20, 25]), d = r3(r * (Math.SQRT2 - 1)), esq = pick(['bl', 'br', 'tr', 'tl']);
+      const nom = { bl: 'abajo a la izquierda', br: 'abajo a la derecha', tr: 'arriba a la derecha', tl: 'arriba a la izquierda' }[esq];
+      const vx = esq.includes('r') ? W : 0, vy = esq.includes('t') ? H : 0, cx = vx + (esq.includes('r') ? -r : r), cy = vy + (esq.includes('t') ? -r : r);
+      return { e: `Una pieza de <b>${W} × ${H}</b> mm tiene el cero pieza en la esquina de abajo a la izquierda. En la esquina de <b>${nom}</b> mides <b>d = ${F(d, 3)}</b> mm. ¿Qué radio tiene? ¿Dónde está el centro del arco?`,
+        fig: figEsquinaPieza(W, H, esq, r, d), qs: [q('Radio r', d * (Math.SQRT2 + 1), 'mm', 1, 0.11), q('Centro X', cx, '', 1, 0.11), q('Centro Y', cy, '', 1, 0.11)],
+        pista: 'r = d · (√2 + 1). El centro es la esquina del cuadrado opuesta al vértice: a r del vértice en X y a r en Y, hacia dentro de la pieza.',
+        pasos: [cu(`r = ${F(d, 3)} · 2.4142 = ${F(d * (Math.SQRT2 + 1), 3)} → R${r}`), cu(`vértice: X${vx} Y${vy}`, `centro: X${cx} Y${cy}`), `Los puntos de tangencia están a ${r} mm del vértice, uno en cada lado.`] };
+    },
+    3() {
+      const th = pick([60, 72, 100, 108, 120, 135]), r = pick([5, 8, 10, 12, 15, 20, 25]), s = sin(th / 2), k = s / (1 - s), d = r3(r / k);
+      return { e: `En una esquina de <b>${th}°</b> redondeada mides <b>d = ${F(d, 3)}</b> mm desde el vértice hasta el arco, por la bisectriz. ¿Qué radio tiene?`,
+        fig: figEsquinaTheta(th, d), qs: [q('Radio r', d * k, 'mm', 1, Math.max(0.11, 0.0005 * k))],
+        pista: 'En el triángulo V – T – C: ángulo recto en T, cateto r, hipotenusa d + r y, en V, la mitad del ángulo. sen(θ/2) = r / (d + r).',
+        pasos: [cu(`sen(${th}° / 2) = sen ${F(th / 2, 1)}° = ${F(s, 4)}`), cu(`r = d · sen(θ/2) / (1 − sen(θ/2)) = ${F(d, 3)} · ${F(k, 4)} = ${F(d * k, 3)} → R${r}`)] };
+    },
+  },
+  rep: {
+    1() {
+      const H = rs(500, 2000, 10), n = ri(2, 6), e = pick([16, 18, 19, 22, 25]), s = (H - n * e) / (n + 1);
+      return { e: `Un armario mide <b>${N(H)}</b> mm de alto por dentro. Lleva <b>${n}</b> baldas de <b>${e}</b> mm, con todos los huecos iguales. ¿Qué altura tiene cada hueco?`,
+        fig: figReparto('baldas', n, { H: 'H = ' + N(H), s: 's = ?', e: 'e = ' + e }), qs: [q('Hueco s', s)],
+        pista: `${n} baldas dejan ${n + 1} huecos: s = (H − n · e) / (n + 1).`, pasos: [cu(`s = (${H} − ${n} · ${e}) / ${n + 1} = ${H - n * e} / ${n + 1} = ${F(s)} mm`)] };
+    },
+    2() {
+      const L = rs(900, 2500, 50), g = pick([20, 25, 30, 40]), m = pick([100, 100, 110, 120]), n = Math.ceil((L - m) / (m + g) - 1e-9), s = (L - n * g) / (n + 1);
+      return { e: `Una barandilla tiene <b>${N(L)}</b> mm libres entre postes. Los barrotes miden <b>${g}</b> mm y los huecos no pueden pasar de <b>${m}</b> mm. ¿Cuántos barrotes hacen falta como mínimo? ¿Qué hueco queda?`,
+        fig: figReparto('barandilla', n, { L: N(L), s: 's ≤ ' + m }), qs: [q('Barrotes n', n, '', 0), q('Hueco s', s)],
+        pista: `El hueco es (L − n · g) / (n + 1). Plantea que sea ≤ ${m}, despeja n y redondea hacia arriba.`,
+        pasos: [cu(`(${L} − ${g}n) / (n + 1) ≤ ${m}`, `${L} − ${g}n ≤ ${m}n + ${m}  →  ${L - m} ≤ ${m + g}n  →  n ≥ ${F((L - m) / (m + g), 2)}`), cu(`n = ${n}      s = (${L} − ${n * g}) / ${n + 1} = ${F(s)} mm`)] };
+    },
+    3() {
+      const H = rs(500, 900, 10), n = ri(2, 5), h = pick([2, 3, 4]), f = (H - (n + 1) * h) / n;
+      return { e: `Una cajonera tiene un hueco de <b>${H}</b> mm de alto para <b>${n}</b> frentes de cajón iguales. Entre frentes, y también arriba y abajo, se deja una holgura de <b>${h}</b> mm. ¿Qué alto tiene cada frente?`,
+        fig: figReparto('cajonera', n, { H: 'H = ' + H, h: 'holgura ' + h, f: 'frente = ?' }), qs: [q('Alto del frente', f, 'mm', 2, 0.011)],
+        pista: `${n} frentes dejan ${n + 1} holguras.`, pasos: [cu(`frente = (${H} − ${n + 1} · ${h}) / ${n} = ${H - (n + 1) * h} / ${n} = ${F(f, 2)} mm`)] };
+    },
+  },
+  cnc: {
+    1() {
+      const L = rs(30, 150, 5), a = rs(10, 80, 5), x = L * cos(a), y = L * sin(a);
+      return { e: `Desde <b>X0 Y0</b> sale una recta de <b>${L}</b> mm a <b>${a}°</b> (desde el eje X, en sentido antihorario). ¿Cuál es el punto final? (tres decimales)`,
+        fig: figCNC(0, 0, x, y, { pa: 'X0 Y0', pb: '?', dx: 'ΔX', dy: 'ΔY', alfa: a + '°', L: 'L = ' + L }), qs: [q('X', x, '', 3), q('Y', y, '', 3)],
+        pista: 'ΔX = L · cos α y ΔY = L · sen α. Desde el cero, el punto final es directamente (ΔX, ΔY).',
+        pasos: [cu(`X = ${L} · cos ${a}° = ${F(x, 3)}`, `Y = ${L} · sen ${a}° = ${F(y, 3)}`), cu(`G1 X${F(x, 3).replace('−', '-')} Y${F(y, 3).replace('−', '-')}`)] };
+    },
+    2() {
+      let x0, y0, L, a, x, y;
+      do { x0 = rs(0, 120, 10); y0 = rs(0, 80, 10); L = rs(20, 120, 5); a = pick([15, 20, 25, 30, 35, 40, 50, 55, 60, 65, 70, 105, 120, 135, 150, 160, 200, 210, 225, 240, 300, 315, 330, 345]); x = x0 + L * cos(a); y = y0 + L * sin(a); } while (x < 0 || y < 0);
+      const dx = x - x0, dy = y - y0, fx = v => F(v, 3).replace('−', '-');
+      return { e: `Desde <b>X${x0} Y${y0}</b> sale una recta de <b>${L}</b> mm en la dirección <b>${a}°</b> (medida desde el eje X+, en sentido antihorario). ¿Cuál es el punto final en absolutas (G90)? (tres decimales)`,
+        fig: figCNC(x0, y0, x, y, { pa: `X${x0} Y${y0}`, pb: '?', dx: 'ΔX', dy: 'ΔY', alfa: a + '°', L: 'L = ' + L }), qs: [q('X (G90)', x, '', 3), q('Y (G90)', y, '', 3)],
+        pista: 'Calcula los incrementos con ΔX = L · cos α y ΔY = L · sen α (con un ángulo así, la calculadora ya da el signo) y súmalos al punto de inicio.',
+        pasos: [cu(`ΔX = ${L} · cos ${a}° = ${F(dx, 3)}`, `ΔY = ${L} · sen ${a}° = ${F(dy, 3)}`), cu(`X = ${x0} + (${F(dx, 3)}) = ${F(x, 3)}`, `Y = ${y0} + (${F(dy, 3)}) = ${F(y, 3)}`), cu(`G90 G1 X${fx(x)} Y${fx(y)}`, `G91 G1 X${fx(dx)} Y${fx(dy)}`)] };
+    },
+    3() {
+      let x1, y1, x2, y2; do { x1 = rs(0, 150, 5); y1 = rs(0, 100, 5); x2 = rs(0, 150, 5); y2 = rs(0, 100, 5); } while (Math.hypot(x2 - x1, y2 - y1) < 30 || x1 === x2 || y1 === y2);
+      const dx = x2 - x1, dy = y2 - y1, L = Math.hypot(dx, dy); let a = Math.atan2(dy, dx) / D2R; if (a < 0) a += 360; const b = atan(Math.abs(dy) / Math.abs(dx));
+      const cuad = dx > 0 && dy > 0 ? `α = ${F(b, 2)}°` : dx < 0 && dy > 0 ? `α = 180° − ${F(b, 2)}° = ${F(a, 2)}°` : dx < 0 && dy < 0 ? `α = 180° + ${F(b, 2)}° = ${F(a, 2)}°` : `α = 360° − ${F(b, 2)}° = ${F(a, 2)}°`;
+      return { e: `Una recta va de <b>X${x1} Y${y1}</b> a <b>X${x2} Y${y2}</b>. ¿Qué largo tiene? ¿En qué dirección va (ángulo desde el eje X+, en sentido antihorario, de 0° a 360°)?`,
+        fig: figCNC(x1, y1, x2, y2, { pa: `X${x1} Y${y1}`, pb: `X${x2} Y${y2}`, dx: 'ΔX', dy: 'ΔY', alfa: 'α = ?', L: 'L = ?' }), qs: [q('Largo L', L, 'mm', 3), q('Dirección α', a, '°', 1, 0.11)],
+        pista: 'ΔX = X final − X inicial y ΔY igual. L = √(ΔX² + ΔY²). Saca el ángulo agudo con tan⁻¹(|ΔY| / |ΔX|) y colócalo según hacia dónde va la recta.',
+        pasos: [cu(`ΔX = ${x2} − ${x1} = ${dx}      ΔY = ${y2} − ${y1} = ${dy}`), cu(`L = √(${dx}² + ${dy}²) = √${dx * dx + dy * dy} = ${F(L, 3)} mm`), cu(`ángulo agudo = tan⁻¹(${Math.abs(dy)} / ${Math.abs(dx)}) = ${F(b, 2)}°`, cuad)] };
+    },
+  },
+};
+
+/* ---------------------------------------------------------------- figuras de los temas 9-11 */
+function figCercha(th, lab) {
+  const g = new G(600, 320); const y0 = 250, xl = 110, xr = 450, a = (xr - xl) / 2, cx = 280; const thd = Math.min(Math.max(th, 12), 50); const h = a * tan(thd), top = y0 - h, v = lab.v ? 45 : 0;
+  g.rect(xl - 12, y0 + 10, 24, 50, '#e3e8ee', C.gris); g.rect(xr - 12, y0 + 10, 24, 50, '#e3e8ee', C.gris);
+  g.line(xl - 16, y0 + 5, xr + 16, y0 + 5, C.madD, 10); g.line(xl - 16, y0 + 5, xr + 16, y0 + 5, C.madL, 1);
+  for (const s of [-1, 1]) { const x0 = cx + s * (a + v), yy = y0 + v * tan(thd); g.line(x0, yy, cx, top, C.madD, 11); g.line(x0, yy, cx, top, C.madL, 1); }
+  if (lab.y !== undefined) { const yN = y0 - lab.yf * h, w = a * (1 - lab.yf); g.line(cx - w, yN, cx + w, yN, C.nar, 6); g.text(cx, yN - 10, lab.y, C.nar, 13); g.dim(xl - 26, y0, xl - 26, yN, 0, null, C.tinta); g.text(xl - 32, (y0 + yN) / 2 + 5, lab.yl, C.tinta, 12, 'end'); }
+  else { g.line(cx, top, cx, y0, C.madD, 9); g.line(cx, top, cx, y0, C.madL, 1); }
+  g.ang(xl, y0, 56, 0, thd, lab.th, C.tinta, 76, 13);
+  g.dim(xl, y0, xr, y0, -44, lab.luz, C.azul, 13);
+  g.dim(xr + 50, y0, xr + 50, top, 0, null, C.rojo); g.text(xr + 56, (y0 + top) / 2 + 5, lab.h, C.rojo, 13, 'start');
+  g.text(cx - a / 2 - 14, y0 - h / 2 - 16, lab.par, C.verde, 13, 'end');
+  if (v) g.text(xl - 50, y0 + 40, lab.v, C.sub, 12, 'end', 600);
+  return g.svg() + (thd !== th ? '<div class="esc">dibujo sin escala</div>' : '');
+}
+function figCerchas(Lr, s) {
+  const g = new G(600, 260); const n = Math.min(Math.ceil(Lr / s) + 1, 30); const x0 = 60, x1 = 540;
+  g.rect(x0, 160, x1 - x0, 14, C.mad, C.madL);
+  const hw = Math.min(26, (x1 - x0) / (n - 1) * 0.42); for (let k = 0; k < n; k++) { const x = x0 + (x1 - x0) * k / (n - 1); g.poly([[x - hw, 196], [x, 70], [x + hw, 196]], 'none', C.madL, 3, null, false); }
+  g.dim(x0, 220, x1, 220, 0, 'L = ' + N(Lr), C.azul, 13);
+  const xs = x0 + (x1 - x0) / (n - 1); g.dim(x0, 50, xs, 50, 0, null, C.nar); g.text((x0 + xs) / 2, 42, 's = ' + s, C.nar, 12.5);
+  g.text(300, 250, 'cubierta vista de lado: ¿cuántas cerchas?', C.sub, 12, 'middle', 400);
+  return g.svg();
+}
+function figLima(lab) {
+  const g = new G(600, 320); const x0 = 100, y0 = 30, x1 = 560, y1 = 270, a = (y1 - y0) / 2, ym = y0 + a;
+  g.rect(x0, y0, x1 - x0, y1 - y0, 'rgba(0,90,156,.05)', C.azul, 2);
+  for (let k = 1; k <= 6; k++) { const x = x0 + 17 * k; g.line(x, y1, x, y1 - 17 * k, C.nar, 1.2); }
+  g.line(x0 + a, ym, x1 - a, ym, C.tinta, 3);
+  [[x0, y0, x0 + a, ym], [x0, y1, x0 + a, ym], [x1, y0, x1 - a, ym], [x1, y1, x1 - a, ym]].forEach(q => g.line(...q, C.nar2, 3.4));
+  g.ang(x0, y1, 34, 0, 45, '45°', C.tinta, 52, 12);
+  g.dim(x0 - 2, y1, x0 - 2, ym, 18, lab.a, C.azul, 13);
+  g.text(x0 + a + 8, ym + 34, lab.lima, C.nar2, 13, 'start'); g.text(x0 + a / 2 + 40, y1 - 8, lab.pat, C.nar, 12, 'start', 600);
+  g.text(300, ym - 8, 'cumbrera', C.tinta, 12); g.text(300, 300, lab.pend, C.tinta, 13, 'middle', 700);
+  return g.svg();
+}
+function figTolva(t, n, lab) {
+  const g = new G(600, 310); const td = Math.min(t, 40), H = 120, dx = H * tan(td), bl = 100, br = 200, yb = 245, yt = yb - H;
+  g.poly([[bl, yb], [br, yb], [br + dx, yt], [bl - dx, yt]], C.mad, C.madL, 1.8);
+  g.line(bl, yb, bl, yt - 10, C.gris, 1.2, { dash: '5 4' }); g.ang(bl, yb, 64, 90, 90 + td, null, C.tinta); g.text(bl - 14, yb - 74, lab.t, C.tinta, 13, 'end');
+  if (lab.H) { g.dim(br + dx + 18, yb, br + dx + 18, yt, 0, null, C.rojo); g.text(br + dx + 24, (yb + yt) / 2 + 5, lab.H, C.rojo, 13, 'start'); }
+  if (lab.B) g.dim(bl, yb, br, yb, -16, lab.B, C.azul, 12.5);
+  g.text(150, 302, n + ' lados · vista de frente', C.sub, 12, 'middle', 600);
+  const X = atan(sin(t) * tan(180 / n)); let hh = H / cos(t), e = hh * tan(X); const kk = Math.min(1, 90 / e, 180 / hh); hh *= kk; e *= kk; const pl = 440, pr = 520, pb = 250, pt = pb - hh;
+  g.poly([[pl, pb], [pr, pb], [pr + e, pt], [pl - e, pt]], 'rgba(211,84,0,.18)', C.nar, 2);
+  g.line(pl, pb, pl, pt - 8, C.gris, 1.2, { dash: '5 4' }); g.ang(pl, pb, 56, 90, 90 + X, null, C.tinta); g.text(pl - 12, pb - 66, lab.X || 'X = ?', C.tinta, 13, 'end');
+  g.text(480, 302, 'un lado, tumbado', C.sub, 12, 'middle', 600);
+  return g.svg();
+}
+function figOjival(L, h, lab) {
+  const g = new G(600, 330); const s = Math.min(300 / L, 260 / h), Lp = L * s, hp = h * s, R = (hp * hp + Lp * Lp / 4) / Lp; const y0 = 300, xl = 300 - Lp / 2, xr = 300 + Lp / 2, e = 22;
+  const he = sq((R + e) ** 2 - (R - Lp / 2) ** 2);
+  g.path(`M${f2(xl - e)},${y0} A${f2(R + e)},${f2(R + e)} 0 0,1 300,${f2(y0 - he)} A${f2(R + e)},${f2(R + e)} 0 0,1 ${f2(xr + e)},${y0} L${f2(xr)},${y0} A${f2(R)},${f2(R)} 0 0,0 300,${f2(y0 - hp)} A${f2(R)},${f2(R)} 0 0,0 ${f2(xl)},${y0} Z`, C.mad, C.madL, 1.8);
+  const c1 = xl + R; g.line(Math.min(xl, c1) - 40, y0, Math.max(xr, 600 - c1) + 40, y0, C.gris, 1, { dash: '6 4' });
+  if (c1 < 590) { g.line(c1, y0, 300, y0 - hp, C.azul, 1.5); g.dot(c1, y0, C.azul, 4); g.dot(600 - c1, y0, C.verde, 4); g.text((c1 + 300) / 2 + 10, y0 - hp / 2, lab.R, C.azul, 14, 'start'); }
+  g.dim(xl, y0, xr, y0, 30, null, C.tinta); g.text(300, y0 - 38, lab.L, C.tinta, 13);
+  g.dim(xl - 40, y0, xl - 40, y0 - hp, 0, lab.h, C.rojo, 13);
+  return g.svg();
+}
+function carpanelR(L, f) { const a = L / 2, k = sq(a * a + f * f), d = a - f, r1 = k * (k - d) / (2 * a), y = ((a - r1) ** 2 - (f - r1) ** 2) / (2 * (f - r1)); return { a, k, d, r1, y, r2: f + y }; }
+function figCarpanel(L, f, lab) {
+  const s = 380 / L, c = carpanelR(L * s, f * s), ox = 300, oy = 200; const g = new G(600, Math.round(Math.min(oy + c.y + 30, 420)));
+  const A = [ox - c.a, oy], T = [ox, oy - f * s], O1 = [ox - c.a + c.r1, oy], O2 = [ox, oy + c.y];
+  const ux = O1[0] - O2[0], uy = O1[1] - O2[1], l = Math.hypot(ux, uy), P1 = [O2[0] + ux / l * c.r2, O2[1] + uy / l * c.r2], P2 = [2 * ox - P1[0], P1[1]];
+  g.path(`M${f2(A[0])},${oy} A${f2(c.r1)},${f2(c.r1)} 0 0,1 ${f2(P1[0])},${f2(P1[1])} A${f2(c.r2)},${f2(c.r2)} 0 0,1 ${f2(P2[0])},${f2(P2[1])} A${f2(c.r1)},${f2(c.r1)} 0 0,1 ${f2(ox + c.a)},${oy} Z`, C.mad, C.madL, 2);
+  g.line(A[0] - 30, oy, ox + c.a + 30, oy, C.gris, 1, { dash: '6 4' }); g.line(ox, T[1] - 15, ox, O2[1], C.gris, 1, { dash: '6 4' });
+  g.line(...O2, ...P1, C.azul, 1.3); g.line(...O1, ...P1, C.verde, 1.6); g.dot(...O1, C.verde, 4); g.dot(2 * ox - O1[0], oy, C.verde, 4); g.dot(...O2, C.azul, 4);
+  g.text(O1[0], oy + 18, 'O₁', C.verde, 13); g.text(O2[0] + 8, O2[1] + 4, 'O₂', C.azul, 13, 'start');
+  g.text((O1[0] + P1[0]) / 2 - 8, (O1[1] + P1[1]) / 2, lab.r1, C.verde, 13, 'end'); g.text(ox - 30, oy + c.y / 2, lab.r2, C.azul, 13, 'end');
+  g.dim(A[0], oy, ox + c.a, oy, 0, null, C.tinta); g.text(ox + c.a / 2, oy + 18, lab.L, C.tinta, 13);
+  g.dim(ox + c.a + 30, oy, ox + c.a + 30, T[1], 0, null, C.rojo); g.text(ox + c.a + 36, oy - f * s / 2 + 5, lab.f, C.rojo, 13, 'start');
+  return g.svg();
+}
+function figElipse(A2, B2, lab) {
+  const g = new G(600, 300); const s = Math.min(420 / A2, 230 / B2), a = A2 * s / 2, b = B2 * s / 2, cx = 260, cy = 150, c = sq(a * a - b * b);
+  g.path(`M${f2(cx - a)},${cy} A${f2(a)},${f2(b)} 0 1,0 ${f2(cx + a)},${cy} A${f2(a)},${f2(b)} 0 1,0 ${f2(cx - a)},${cy} Z`, C.mad, C.madL, 2);
+  g.line(cx - a, cy, cx + a, cy, C.gris, 1, { dash: '6 4' }); g.line(cx, cy - b, cx, cy + b, C.gris, 1, { dash: '6 4' });
+  const t = 58 * D2R, Pp = [cx + a * Math.cos(t), cy - b * Math.sin(t)]; g.line(cx - c, cy, ...Pp, C.nar, 2); g.line(...Pp, cx + c, cy, C.nar, 2);
+  g.dot(cx - c, cy, C.tinta, 4.5); g.dot(cx + c, cy, C.tinta, 4.5); g.dot(...Pp, C.nar, 4.5);
+  g.dim(cx - a, cy + b + 16, cx + a, cy + b + 16, 0, null, C.azul); g.text(cx, cy + b + 32, lab.A, C.azul, 13);
+  g.dim(cx + a + 20, cy + b, cx + a + 20, cy - b, 0, null, C.rojo); g.text(cx + a + 26, cy + 5, lab.B, C.rojo, 13, 'start');
+  g.text(cx - c / 2, cy - 8, lab.c, C.tinta, 13); g.text(Pp[0] + 10, Pp[1] - 8, lab.cuerda, C.nar, 12.5, 'start');
+  return g.svg();
+}
+function figCimbra(th, n, lab) {
+  const g = new G(600, 300); const R = 190, cx = 230, a0 = 90 - th / 2; const cy = 40 + R; const st = th / n;
+  for (let k = 0; k < n; k++) { const a1 = a0 + k * st, a2 = a1 + st, p1 = P(cx, cy, R, a1), p2 = P(cx, cy, R, a2), q1 = P(cx, cy, R - 34, a1), q2 = P(cx, cy, R - 34, a2);
+    g.path(`M${f2(p1[0])},${f2(p1[1])} A${R},${R} 0 0,0 ${f2(p2[0])},${f2(p2[1])} L${f2(q2[0])},${f2(q2[1])} L${f2(q1[0])},${f2(q1[1])} Z`, k === 0 ? 'rgba(211,84,0,.22)' : C.mad, C.madL, 1.4); g.line(...p1, ...p2, C.tinta, .9, { dash: '4 3' }); }
+  g.dot(cx, cy, C.tinta, 3); g.line(cx, cy, ...P(cx, cy, R, a0), C.gris, 1, { dash: '4 4' }); g.line(cx, cy, ...P(cx, cy, R, a0 + th), C.gris, 1, { dash: '4 4' });
+  g.ang(cx, cy, 44, a0, a0 + th, null, C.tinta); g.text(cx, cy - 52, lab.th, C.tinta, 13);
+  g.text(cx + 30, cy - R / 2, lab.R, C.azul, 13, 'start');
+  g.text(470, 110, lab.n, C.tinta, 13, 'middle', 700); g.text(470, 134, lab.e, C.tinta, 13, 'middle', 700); g.text(470, 170, 'ancho de tabla = s + e', C.nar, 12.5, 'middle', 700);
+  return g.svg() + (cy > 300 ? '' : '');
+}
+
+/* ---------------------------------------------------------------- generadores de los temas 9-11 */
+Object.assign(GEN, {
+  cub: {
+    1() {
+      if (RND() < .6) {
+        const Lz = rs(3000, 9000, 100), p = rs(15, 60, 5), a = Lz / 2, h = a * p / 100, th = atan(p / 100), par = sq(a * a + h * h);
+        return { e: `Una cubierta a dos aguas tiene <b>${N(Lz)}</b> mm de luz y una pendiente del <b>${p} %</b>. ¿Qué altura tiene la cumbrera sobre los apoyos, qué ángulo θ forma y qué largo tiene el par entre el apoyo y la cumbrera?`,
+          fig: figCercha(th, { luz: 'luz = ' + N(Lz), h: 'h = ?', par: 'par = ?', th: 'θ = ?' }), qs: [q('Altura h', h), q('Ángulo θ', th, '°'), q('Par', par)],
+          pista: 'Trabaja con la semiluz a = luz / 2. La pendiente es h / a: h = a · pendiente / 100. El par es la hipotenusa.',
+          pasos: [cu(`a = ${Lz} / 2 = ${a}`, `h = ${a} · ${F(p / 100, 2)} = ${F(h)} mm`), cu(`θ = tan⁻¹ ${F(p / 100, 2)} = ${F(th, 2)}°`), cu(`par = √(${a}² + ${F(h)}²) = ${F(par)} mm`)] };
+      }
+      const Lr = rs(4000, 15000, 100), s = pick([500, 600, 700, 800, 900, 1000, 1200]), esp = Math.ceil(Lr / s - 1e-9), n = esp + 1;
+      return { e: `Una cubierta tiene <b>${N(Lr)}</b> mm de largo y las cerchas van separadas <b>${s}</b> mm como máximo. ¿Cuántas cerchas hacen falta? ¿A qué separación real quedan si se reparten iguales?`,
+        fig: figCerchas(Lr, s), qs: [q('Cerchas', n, '', 0), q('Separación real', Lr / esp)],
+        pista: 'L / s da el número de espacios (redondea hacia arriba). Hay una cercha más que espacios. La separación real es L entre el número de espacios.',
+        pasos: [cu(`${Lr} / ${s} = ${F(Lr / s, 2)} → ${esp} espacios`, `n = ${esp} + 1 = ${n} cerchas`), cu(`separación real = ${Lr} / ${esp} = ${F(Lr / esp)} mm`)] };
+    },
+    2() {
+      if (RND() < .55) {
+        const Lz = rs(4000, 9000, 100), th = ri(15, 45), v = rs(200, 800, 50), a = Lz / 2, par = (a + v) / cos(th);
+        return { e: `Una cubierta de <b>${N(Lz)}</b> mm de luz tiene una pendiente de <b>${th}°</b> y un vuelo de <b>${v}</b> mm (medido en horizontal). ¿Qué largo total tiene el par? ¿Qué ángulo forma el corte de cumbrera con el canto del par?`,
+          fig: figCercha(th, { luz: 'luz = ' + N(Lz), h: 'h', par: 'par = ?', th: th + '°', v: 'vuelo ' + v }), qs: [q('Par con vuelo', par), q('Corte de cumbrera', 90 - th, '°')],
+          pista: 'El par con vuelo es la hipotenusa de un triángulo con cateto horizontal a + v y ángulo θ: (a + v) / cos θ. El corte vertical forma 90° − θ con el canto del par.',
+          pasos: [cu(`par = (${a} + ${v}) / cos ${th}° = ${a + v} / ${F(cos(th), 4)} = ${F(par)} mm`), cu(`corte de cumbrera = 90° − ${th}° = ${90 - th}°`)] };
+      }
+      const Lz = rs(4000, 9000, 200), h = rs(1000, 2500, 50), y = rs(Math.round(h * .3 / 50) * 50, Math.round(h * .75 / 50) * 50, 50), nud = Lz * (h - y) / h;
+      return { e: `En una cubierta de par y nudillo de <b>${N(Lz)}</b> mm de luz, la cumbrera está a <b>${N(h)}</b> mm sobre los apoyos. ¿Qué largo (entre ejes de los pares) tiene un nudillo colocado a <b>${N(y)}</b> mm de altura?`,
+        fig: figCercha(atan(h / (Lz / 2)), { luz: 'luz = ' + N(Lz), h: 'h = ' + N(h), par: '', th: '', y: 'nudillo = ?', yf: y / h, yl: 'y = ' + N(y) }), qs: [q('Nudillo', nud)],
+        pista: 'Por semejanza: a la altura y, el ancho entre pares es al ancho total (la luz) lo que (h − y) es a h.',
+        pasos: [cu(`nudillo = ${Lz} · (${h} − ${y}) / ${h} = ${Lz} · ${h - y} / ${h} = ${F(nud)} mm`)] };
+    },
+    3() {
+      const a = rs(1500, 4500, 100), p = rs(20, 60, 5), s = pick([400, 500, 600]), h = a * p / 100, th = atan(p / 100), lima = sq(2 * a * a + h * h), phi = atan(h / (a * Math.SQRT2)), b = atan(sin(phi)), dp = s / cos(th);
+      return { e: `Cubierta a cuatro aguas con faldones de la misma pendiente: semiluz <b>${N(a)}</b> mm, pendiente del <b>${p} %</b> y patillas cada <b>${s}</b> mm. Calcula la altura, el largo de la limatesa, su pendiente, el rebaje de sus cantos y cuánto se acorta cada patilla respecto a la anterior.`,
+        fig: figLima({ a: 'a = ' + N(a), lima: 'limatesa = ?', pat: 'patillas cada ' + s, pend: 'pendiente ' + p + ' %' }),
+        qs: [q('Altura h', h), q('Limatesa', lima), q('Pendiente de la lima φ', phi, '°'), q('Rebaje b', b, '°'), q('Acortado de patilla', dp)],
+        pista: 'En planta la lima va a 45°: recorre a · √2. lima = √(2a² + h²); φ = tan⁻¹(h / (a√2)); tan b = sen φ; cada patilla acorta s / cos θ.',
+        pasos: [cu(`h = ${a} · ${F(p / 100, 2)} = ${F(h)} mm      θ = ${F(th, 2)}°`), cu(`lima = √(2 · ${a}² + ${F(h)}²) = ${F(lima)} mm`), cu(`φ = tan⁻¹(${F(h)} / ${F(a * Math.SQRT2, 1)}) = ${F(phi, 2)}°`), cu(`b = tan⁻¹(sen ${F(phi, 2)}°) = ${F(b, 2)}°`), cu(`patillas: ${s} / cos ${F(th, 2)}° = ${F(dp)} mm`)] };
+    },
+  },
+  icp: {
+    1() {
+      const t = pick([5, 10, 15, 20, 25, 30, 35, 40, 45]), X = atan(sin(t)), Y = asin(cos(t) * sin(45));
+      return { e: `Una tolva <b>cuadrada</b> tiene los lados inclinados <b>${t}°</b> respecto a la vertical. ¿A cuánto se gira la mesa de la ingletadora (X, desde el corte a escuadra) y a cuánto se inclina la hoja (Y, desde la vertical)?`,
+        fig: figTolva(t, 4, { t: t + '°' }), qs: [q('Giro de la mesa X', X, '°'), q('Inclinación de la hoja Y', Y, '°')],
+        pista: 'X = tan⁻¹(sen t · tan(180°/n)) y Y = sen⁻¹(cos t · sen(180°/n)). En una caja cuadrada, 180° / 4 = 45° y tan 45° = 1.',
+        pasos: [cu(`X = tan⁻¹(sen ${t}° · tan 45°) = tan⁻¹ ${F(sin(t), 4)} = ${F(X, 2)}°`), cu(`Y = sen⁻¹(cos ${t}° · sen 45°) = sen⁻¹ ${F(cos(t) * sin(45), 4)} = ${F(Y, 2)}°`)] };
+    },
+    2() {
+      const n = pick([3, 5, 6, 8]), t = rs(5, 60, 5), m = 180 / n, X = atan(sin(t) * tan(m)), Y = asin(cos(t) * sin(m));
+      const nom = { 3: 'triangular', 5: 'pentagonal', 6: 'hexagonal', 8: 'octogonal' }[n];
+      return { e: `Una caja <b>${nom}</b> tiene los lados inclinados <b>${t}°</b> respecto a la vertical. Calcula el giro de la mesa X y la inclinación de la hoja Y.`,
+        fig: figTolva(t, n, { t: t + '°' }), qs: [q('Giro de la mesa X', X, '°'), q('Inclinación de la hoja Y', Y, '°')],
+        pista: `Primero 180° / ${n} = ${F(m, 1)}°. Después X = tan⁻¹(sen t · tan ${F(m, 1)}°) y Y = sen⁻¹(cos t · sen ${F(m, 1)}°).`,
+        pasos: [cu(`180° / ${n} = ${F(m, 2)}°`), cu(`X = tan⁻¹(sen ${t}° · tan ${F(m, 2)}°) = ${F(X, 2)}°`), cu(`Y = sen⁻¹(cos ${t}° · sen ${F(m, 2)}°) = ${F(Y, 2)}°`)] };
+    },
+    3() {
+      const H = rs(150, 400, 10), t = ri(10, 35), B = rs(150, 400, 10), w = H / cos(t), T = B + 2 * H * tan(t), X = atan(sin(t)), Y = asin(cos(t) * sin(45));
+      return { e: `Tolva cuadrada de <b>${H}</b> mm de alto (en vertical), lados a <b>${t}°</b> de la vertical y boca de abajo de <b>${B} × ${B}</b> mm. ¿Qué ancho tienen las tablas? ¿Qué mide la boca de arriba? ¿Qué X y Y llevan los cortes?`,
+        fig: figTolva(t, 4, { t: t + '°', H: 'H = ' + H, B: B }), qs: [q('Ancho de tabla', w), q('Boca de arriba', T), q('Giro X', X, '°'), q('Hoja Y', Y, '°')],
+        pista: 'La tabla es la hipotenusa: H / cos t. Cada lado se abre H · tan t, así que la boca crece el doble. Para X y Y, las fórmulas del inglete compuesto con n = 4.',
+        pasos: [cu(`ancho = ${H} / cos ${t}° = ${F(w)} mm`), cu(`boca de arriba = ${B} + 2 · ${H} · tan ${t}° = ${F(T)} mm`), cu(`X = tan⁻¹(sen ${t}°) = ${F(X, 2)}°      Y = sen⁻¹(cos ${t}° · sen 45°) = ${F(Y, 2)}°`)] };
+    },
+  },
+  arm: {
+    1() {
+      if (RND() < .5) {
+        const L = rs(500, 1600, 50), h = L * sq(3) / 2;
+        return { e: `Un arco ojival <b>equilátero</b> tiene <b>${N(L)}</b> mm de luz. ¿Qué radio tiene cada arco y a qué altura queda la punta sobre los arranques?`,
+          fig: figOjival(L, h, { L: 'L = ' + N(L), h: 'h = ?', R: 'R = ?' }), qs: [q('Radio R', L), q('Altura h', h)],
+          pista: 'En el equilátero, cada arco tiene el centro en el arranque contrario: R = L. La punta y los arranques forman un triángulo equilátero: h = L · √3 / 2.',
+          pasos: [cu(`R = L = ${L} mm`), cu(`h = ${L} · √3 / 2 = ${L} · 0.866 = ${F(h)} mm`)] };
+      }
+      const L = rs(600, 2000, 50), f = L * (1 - cos(30));
+      return { e: `Un arco <b>escarzano</b> tiene <b>${N(L)}</b> mm de luz. ¿Qué radio tiene? ¿Qué flecha?`,
+        fig: figArco(L, f, { c: 'L = ' + N(L), f: 'f = ?', R: 'R = ?' }), qs: [q('Radio R', L), q('Flecha f', f)],
+        pista: 'El centro y los dos arranques forman un triángulo equilátero: R = L. La flecha es R menos la altura de ese triángulo: L · (1 − cos 30°).',
+        pasos: [cu(`R = L = ${L} mm`), cu(`f = ${L} · (1 − cos 30°) = ${L} · 0.134 = ${F(f)} mm`)] };
+    },
+    2() {
+      if (RND() < .55) {
+        const L = rs(600, 1600, 50), h = rs(Math.round(L * .6 / 50) * 50, Math.round(L * 1.6 / 50) * 50, 50), R = (h * h + L * L / 4) / L, b = acos((R - L / 2) / R);
+        return { e: `Una ventana ojival tiene <b>${N(L)}</b> mm de luz y la punta a <b>${N(h)}</b> mm de los arranques. ¿Qué radio tiene cada arco? ¿Qué ángulo abarca cada uno desde su centro?`,
+          fig: figOjival(L, h, { L: 'L = ' + N(L), h: 'h = ' + N(h), R: 'R = ?' }), qs: [q('Radio R', R), q('Ángulo β', b, '°')],
+          pista: 'Triángulo centro – mitad de la luz – punta: R² = (R − L/2)² + h². Despejando, R = (h² + L²/4) / L. Luego β = cos⁻¹((R − L/2) / R).',
+          pasos: [cu(`R = (${h}² + ${L}² / 4) / ${L} = (${N(h * h)} + ${N(L * L / 4)}) / ${L} = ${F(R)} mm`), cu(`β = cos⁻¹((${F(R)} − ${L / 2}) / ${F(R)}) = ${F(b, 2)}°`)] };
+      }
+      const A2 = rs(900, 2400, 50), B2 = rs(Math.round(A2 * .4 / 50) * 50, Math.round(A2 * .75 / 50) * 50, 50), c = sq((A2 / 2) ** 2 - (B2 / 2) ** 2);
+      return { e: `Vas a trazar un tablero ovalado (elipse) de <b>${N(A2)} × ${N(B2)}</b> mm con el método del jardinero. ¿A qué distancia del centro clavas cada clavo? ¿Qué largo tiene la cuerda (clavo – lápiz – clavo)?`,
+        fig: figElipse(A2, B2, { A: '2a = ' + N(A2), B: '2b = ' + N(B2), c: 'c = ?', cuerda: 'cuerda = ?' }), qs: [q('Distancia c', c), q('Cuerda', A2)],
+        pista: 'a y b son las mitades del largo y del ancho. c = √(a² − b²). La cuerda, de clavo a lápiz y a clavo, mide 2a.',
+        pasos: [cu(`a = ${A2 / 2}      b = ${B2 / 2}`), cu(`c = √(${A2 / 2}² − ${B2 / 2}²) = ${F(c)} mm`), cu(`cuerda = 2a = ${A2} mm`)] };
+    },
+    3() {
+      if (RND() < .5) {
+        const L = rs(800, 2000, 50), f = rs(Math.round(L * .25 / 10) * 10, Math.round(L * .42 / 10) * 10, 10), c = carpanelR(L, f);
+        return { e: `Calcula los radios de un arco <b>carpanel de tres centros</b> de <b>${N(L)}</b> mm de luz y <b>${f}</b> mm de flecha.`,
+          fig: figCarpanel(L, f, { L: 'L = ' + N(L), f: 'f = ' + f, r1: 'r₁', r2: 'r₂' }), qs: [q('Radio pequeño r₁', c.r1), q('Radio grande r₂', c.r2, 'mm', 1, Math.max(0.3, c.r2 * 0.001))],
+          pista: 'a = L/2, k = √(a² + f²), d = a − f. r₁ = k(k − d) / 2a. Después y = ((a − r₁)² − (f − r₁)²) / (2(f − r₁)) y r₂ = f + y.',
+          pasos: [cu(`a = ${L / 2}      k = √(${L / 2}² + ${f}²) = ${F(c.k, 2)}      d = ${L / 2} − ${f} = ${c.d}`), cu(`r₁ = ${F(c.k, 2)} · ${F(c.k - c.d, 2)} / ${L} = ${F(c.r1)} mm`), cu(`y = (${F(c.a - c.r1, 2)}² − ${F(f - c.r1, 2)}²) / (2 · ${F(f - c.r1, 2)}) = ${F(c.y)}`, `r₂ = ${f} + ${F(c.y)} = ${F(c.r2)} mm`)] };
+      }
+      const R = rs(400, 2000, 50), th = pick([60, 90, 120, 180]), n = ri(2, 6), e = pick([30, 40, 50]), m = th / (2 * n), cu_ = 2 * R * sin(m), s = R * (1 - cos(m));
+      return { e: `Una cimbra de radio <b>${N(R)}</b> mm abarca <b>${th}°</b> y se hace con <b>${n}</b> segmentos iguales, dejando <b>${e}</b> mm de canto por debajo de la cuerda. ¿Qué cuerda tiene cada segmento? ¿Qué ancho de tabla hace falta?`,
+        fig: figCimbra(th, n, { th: th + '°', R: 'R = ' + N(R), n: n + ' segmentos', e: 'e = ' + e }), qs: [q('Cuerda del segmento', cu_), q('Ancho de tabla', s + e)],
+        pista: 'Cada segmento abarca θ / n. Con la mitad de ese ángulo: cuerda = 2R · sen(θ/2n) y flecha s = R(1 − cos(θ/2n)). Ancho = s + e.',
+        pasos: [cu(`θ / n = ${F(th / n, 2)}°      la mitad: ${F(m, 2)}°`), cu(`cuerda = 2 · ${R} · sen ${F(m, 2)}° = ${F(cu_)} mm`), cu(`s = ${R} · (1 − cos ${F(m, 2)}°) = ${F(s)} mm      ancho = ${F(s)} + ${e} = ${F(s + e)} mm`)] };
+    },
+  },
+});
+
+function rincon(b) {
+  const g = new G(600, 300), V = [300, 50], half = b / 2, w = 18, L = 230;
+  const A = P(...V, L, 270 - half), B = P(...V, L, 270 + half);
+  const nA = P(0, 0, w, 360 - half), nB = P(0, 0, w, 180 + half), M = P(...V, w / sin(half), 270);
+  g.poly([V, A, [A[0] + nA[0], A[1] + nA[1]], M], C.mad, C.madL, 1.4);
+  g.poly([V, B, [B[0] + nB[0], B[1] + nB[1]], M], 'rgba(211,84,0,.25)', C.nar, 1.4);
+  g.line(...V, ...A, C.gris, 4); g.line(...V, ...B, C.gris, 4);
+  g.ang(...V, 80, 270 - half, 270 + half, b + '°', C.tinta, 102, 15);
+  g.text(300, 292, 'rincón visto desde arriba: la pared en gris y el rodapié en madera', C.sub, 12, 'middle', 400);
+  return g.svg();
+}
+
+function generar(tema, nivel) {
+  const r = GEN[tema][nivel](); r.tema = tema; r.nivel = nivel; return r;
+}
+
+/* ================================================================ práctica */
+const S = { tema: 'pit', nivel: 1, ej: null, ok: 0, tot: 0, racha: 0, intento: 0, contado: false, pista: false, visto: false };
+const $ = id => document.getElementById(id);
+function htmlNivel(n) { return `<span class="niv n${n}">${'●'.repeat(n)}</span>`; }
+
+function pintaTemas() {
+  $('temas').innerHTML = TEMAS.map(t => `<button data-t="${t.k}" class="${t.k === S.tema ? 'on' : ''}">${t.n}</button>`).join('');
+  $('f-temas').innerHTML = TEMAS.map(t => `<label class="chk"><input type="checkbox" class="f-tema" value="${t.k}" checked> ${t.n}</label>`).join('');
+}
+function nuevo() {
+  RND = Math.random; S.ej = generar(S.tema, S.nivel); S.intento = 0; S.contado = false; S.pista = false; S.visto = false;
+  const e = S.ej, t = TEMAS.find(x => x.k === e.tema).n;
+  $('ejercicio').innerHTML = `
+    <div class="ej-cab"><h3>${t}</h3>${htmlNivel(e.nivel)}</div>
+    <div class="enun">${e.e}</div>
+    <div class="fig">${e.fig}</div>
+    ${e.nota ? `<div class="aviso">${e.nota}</div>` : ''}
+    <div class="resp">${e.qs.map((p, i) => `<div class="campo" id="c${i}"><label for="i${i}">${p.l}${p.d === 0 ? ' (número entero)' : ''}</label>
+      <div class="fila"><input id="i${i}" inputmode="decimal" autocomplete="off"><span class="ud">${p.u}</span></div><div class="msg"></div></div>`).join('')}</div>
+    <div class="acciones">
+      <button class="btn azul" id="b-comp">Comprobar</button>
+      <button class="btn sec" id="b-pista">Pista</button>
+      <button class="btn sec" id="b-sol">Ver solución</button>
+      <button class="btn" id="b-nuevo2">Otro ejercicio</button>
+    </div>
+    <div id="extra"></div>`;
+  $('b-comp').onclick = comprobar; $('b-pista').onclick = verPista; $('b-sol').onclick = verSol; $('b-nuevo2').onclick = nuevo;
+  e.qs.forEach((_, i) => $('i' + i).addEventListener('keydown', ev => { if (ev.key === 'Enter') comprobar(); }));
+  const i0 = $('i0'); if (i0 && window.matchMedia('(min-width: 821px)').matches) i0.focus();
+}
+function leer(s) { s = String(s).trim().replace(/\s/g, '').replace(',', '.').replace('−', '-'); if (s === '' || isNaN(Number(s))) return null; return Number(s); }
+function comprobar() {
+  const e = S.ej; let todos = true, alguno = false;
+  e.qs.forEach((p, i) => {
+    const c = $('c' + i), v = leer($('i' + i).value), m = c.querySelector('.msg'); c.classList.remove('ok', 'ko');
+    if (v === null) { m.textContent = 'Escribe un número.'; todos = false; return; }
+    alguno = true;
+    const bien = [p.v].concat(p.alt || []).some(v0 => Math.abs(v - v0) <= p.t + 1e-9);
+    if (bien) { c.classList.add('ok'); m.textContent = '✓ Correcto'; }
+    else {
+      c.classList.add('ko'); todos = false;
+      const rel = Math.abs(v - p.v) / Math.max(Math.abs(p.v), 1e-9);
+      m.textContent = (p.u === '°' && Math.abs(v - p.v * D2R) < 0.01) ? '✗ ¿Calculadora en radianes? Ponla en DEG.' : rel < 0.01 ? '✗ Muy cerca: revisa el redondeo.' : '✗ Revisa el cálculo.';
+    }
+  });
+  if (!alguno) return;
+  S.intento++;
+  if (!S.contado) {
+    S.contado = true; S.tot++;
+    if (todos && !S.pista && !S.visto) { S.ok++; S.racha++; } else S.racha = 0;
+    $('m-ok').textContent = S.ok; $('m-tot').textContent = S.tot; $('m-racha').textContent = S.racha;
+  }
+  if (todos) $('extra').innerHTML = `<div class="caja" style="border-color:var(--verde)"><h4 style="color:var(--verde)">¡Bien hecho!</h4>Mira la solución paso a paso para comparar, o pasa al siguiente ejercicio.</div>`;
+}
+function verPista() { S.pista = true; const x = $('extra'); if (!x.querySelector('.pista')) x.insertAdjacentHTML('afterbegin', `<div class="caja pista"><h4>💡 Pista</h4>${S.ej.pista}</div>`); }
+function verSol() {
+  S.visto = true; const x = $('extra'); if (x.querySelector('.sol')) return;
+  const e = S.ej;
+  x.insertAdjacentHTML('beforeend', `<div class="caja sol"><h4>Solución paso a paso</h4><ol class="pasos">${e.pasos.map(p => `<li>${p}</li>`).join('')}</ol>
+    <div style="margin-top:8px"><b>Resultado:</b> ${e.qs.map(p => `${p.l} = <b>${F(p.v, Math.max(p.d, p.d === 0 ? 0 : p.d))}</b> ${p.u}`).join(' · ')}</div></div>`);
+}
+
+/* ================================================================ ficha */
+function genFicha() {
+  const temas = [...document.querySelectorAll('.f-tema:checked')].map(x => x.value);
+  const nivs = [...document.querySelectorAll('.f-niv:checked')].map(x => +x.value);
+  if (!temas.length || !nivs.length) { $('ficha-salida').innerHTML = '<div class="panel">Elige al menos un tema y un nivel.</div>'; return; }
+  const n = Math.min(Math.max(+$('f-n').value || 6, 1), 20), V = Math.min(Math.max(+$('f-ver').value || 1, 1), 40), sem = Math.max(+$('f-semilla').value || 1, 1);
+  const tit = esc($('f-titulo').value || 'Ejercicios'), sol = $('f-sol').checked;
+  let hojas = '', solus = '';
+  for (let v = 1; v <= V; v++) {
+    RND = mulberry32(sem * 1000 + v);
+    const orden = temas.slice(); for (let i = orden.length - 1; i > 0; i--) { const j = Math.floor(RND() * (i + 1)); [orden[i], orden[j]] = [orden[j], orden[i]]; }
+    const lista = []; for (let i = 0; i < n; i++) lista.push(generar(orden[i % orden.length], pick(nivs)));
+    lista.sort((a, b) => a.nivel - b.nivel);
+    const cod = `${sem}-${v}`;
+    hojas += `<div class="hoja"><div class="cab"><h2>${tit}</h2><div class="dat">${V > 1 ? `Versión <b>${v}</b> · ` : ''}serie ${cod}</div></div>
+      <div class="alumno">Nombre: ______________________________________ &nbsp; Fecha: ______________ &nbsp; Calculadora en DEG ✓</div>
+      ${lista.map((e, i) => `<div class="item"><div><span class="n">${i + 1}.</span> ${htmlNivel(e.nivel)} ${e.e}
+        <div class="hueco">${e.qs.map(p => `${p.l}: <span></span> ${p.u}`).join('<br>')}</div></div><div>${e.fig}</div></div>`).join('')}
+      <div class="pie">Matemáticas para la madera · Eloi A.A.</div></div>`;
+    solus += `<h3>${V > 1 ? `Versión ${v} · ` : ''}serie ${cod}</h3>` + lista.map((e, i) => `<div class="s"><b>${i + 1}.</b> ${e.qs.map(p => `${p.l} = <b>${F(p.v, p.d)}</b> ${p.u}`).join(' · ')}</div>`).join('');
+  }
+  if (sol) hojas += `<div class="hoja solu"><div class="cab"><h2>Soluciones</h2><div class="dat">${tit}</div></div>${solus}</div>`;
+  $('ficha-salida').innerHTML = hojas; $('f-imp').disabled = false; RND = Math.random;
+}
+
+
+
+/* ---------------------------------------------------------------- vista 3D (three.js, carpeta assets) */
+const T3 = { ok: false };
+function t3Init() {
+  if (T3.ok) return true;
+  if (typeof THREE === 'undefined') return false;
+  const r = new THREE.WebGLRenderer({ antialias: true, alpha: true }); r.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  r.domElement.className = 't3'; r.domElement.style.display = 'block'; r.domElement.style.width = '100%'; r.domElement.style.cursor = 'grab'; r.domElement.style.touchAction = 'none';
+  const esc = new THREE.Scene(), cam = new THREE.PerspectiveCamera(35, 1, 1, 30000);
+  esc.add(new THREE.AmbientLight(0xffffff, .55));
+  const l1 = new THREE.DirectionalLight(0xffffff, .75); l1.position.set(300, 500, 400); esc.add(l1);
+  const l2 = new THREE.DirectionalLight(0xffffff, .3); l2.position.set(-400, -200, -300); esc.add(l2);
+  const piv = new THREE.Group(), grupo = new THREE.Group(); piv.add(grupo); esc.add(piv);
+  Object.assign(T3, { ok: true, r, esc, cam, piv, grupo, rx: -0.95, rz: 0.6,
+    mMad: new THREE.MeshLambertMaterial({ color: 0xd9b98a, side: THREE.DoubleSide }),
+    mSel: new THREE.MeshLambertMaterial({ color: 0xEF9F27, side: THREE.DoubleSide }),
+    mJun: new THREE.MeshLambertMaterial({ color: 0xD85A30, side: THREE.DoubleSide }),
+    mLin: new THREE.LineBasicMaterial({ color: 0x444441 }) });
+  let arr = null; const cv = r.domElement;
+  cv.addEventListener('pointerdown', e => { arr = [e.clientX, e.clientY]; cv.setPointerCapture(e.pointerId); cv.style.cursor = 'grabbing'; });
+  cv.addEventListener('pointermove', e => { if (!arr) return; T3.rz += (e.clientX - arr[0]) * 0.01; T3.rx = Math.max(-3, Math.min(0.2, T3.rx + (e.clientY - arr[1]) * 0.01)); arr = [e.clientX, e.clientY]; t3Pinta(); });
+  cv.addEventListener('pointerup', () => { arr = null; cv.style.cursor = 'grab'; });
+  new ResizeObserver(t3Tam).observe($('ex-fig'));
+  return true;
+}
+function t3Quad(a, b, c, d, mat) {
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute([...a, ...b, ...c, ...a, ...c, ...d], 3)); g.computeVertexNormals();
+  const o = new THREE.Group(); o.add(new THREE.Mesh(g, mat)); o.add(new THREE.LineSegments(new THREE.EdgesGeometry(g), T3.mLin)); return o;
+}
+function t3Tolva(n, t, sp) {
+  const G0 = T3.grupo; while (G0.children.length) { const c = G0.children[0]; G0.remove(c); c.traverse(o => { if (o.geometry) o.geometry.dispose(); }); }
+  const m = 180 / n, H = 140, w = 18, a0 = 90, tt = tan(t);
+  const aO = z => a0 + z * tt, aI = z => a0 + z * tt - w / cos(t);
+  const Pp = (A, ang, z) => [A / cos(m) * cos(ang), A / cos(m) * sin(ang), z];
+  for (let k = 0; k < n; k++) {
+    const f = 360 * k / n, a1 = f - m, a2 = f + m, sel = k === 0, mat = sel ? T3.mSel : T3.mMad;
+    const o1b = Pp(aO(0), a1, 0), o2b = Pp(aO(0), a2, 0), o2t = Pp(aO(H), a2, H), o1t = Pp(aO(H), a1, H);
+    const i1b = Pp(aI(0), a1, 0), i2b = Pp(aI(0), a2, 0), i2t = Pp(aI(H), a2, H), i1t = Pp(aI(H), a1, H);
+    const g = new THREE.Group();
+    g.add(t3Quad(o1b, o2b, o2t, o1t, mat)); g.add(t3Quad(i1b, i2b, i2t, i1t, mat));
+    g.add(t3Quad(o1b, o2b, i2b, i1b, mat)); g.add(t3Quad(o1t, o2t, i2t, i1t, mat));
+    g.add(t3Quad(o1b, i1b, i1t, o1t, sel ? T3.mJun : mat)); g.add(t3Quad(o2b, i2b, i2t, o2t, sel ? T3.mJun : mat));
+    if (sel) { const d = sp * 130; g.position.set(cos(f) * d, sin(f) * d, 0); }
+    G0.add(g);
+  }
+  G0.position.z = -H / 2; T3.dist = Math.max(620, ((aO(H) / cos(m)) + sp * 130) * 3.1 + H); t3Tam();
+}
+function t3Tam() { if (!T3.ok || !T3.r.domElement.isConnected) return; const W = $('ex-fig').clientWidth - 14, Hh = $('v-explorar').classList.contains('grande') ? 560 : 420; T3.r.setSize(W, Hh); T3.cam.aspect = W / Hh; T3.cam.position.set(0, 0, T3.dist || 720); T3.cam.lookAt(0, 0, 0); T3.cam.updateProjectionMatrix(); t3Pinta(); }
+function t3Pinta() { if (!T3.ok) return; T3.piv.rotation.set(T3.rx, 0, T3.rz); T3.r.render(T3.esc, T3.cam); }
+
+/* ================================================================ explorar */
+const EXP = [
+  { k: 'tri', n: 'Triángulo y pendiente', ps: [['a', 'Avanza (cateto horizontal)', 100, 3000, 10, 1200, 'mm'], ['b', 'Sube (cateto vertical)', 10, 2000, 10, 300, 'mm']],
+    f(p) { const L = Math.hypot(p.a, p.b), al = atan(p.b / p.a);
+      return { fig: figTri(p.a, p.b, { la: N(p.a), lb: N(p.b), lc: 'L = ' + F(L), alfa: F(al, 1) + '°' }), res: [['Hipotenusa', F(L) + ' mm'], ['Ángulo α', F(al, 2) + '°'], ['Pendiente', F(p.b / p.a * 100, 2) + ' %'], ['Ángulo con la vertical', F(90 - al, 2) + '°']] }; } },
+  { k: 'cub', n: 'Cubierta', ps: [['luz', 'Luz', 2000, 12000, 100, 6000, 'mm'], ['p', 'Pendiente', 5, 100, 1, 30, '%'], ['v', 'Vuelo (horizontal)', 0, 1000, 50, 400, 'mm']],
+    f(p) { const a = p.luz / 2, h = a * p.p / 100, th = atan(p.p / 100), phi = atan(h / (a * Math.SQRT2));
+      return { fig: figCercha(th, { luz: 'luz = ' + N(p.luz), h: 'h = ' + F(h), par: 'par', th: F(th, 1) + '°', v: p.v ? 'vuelo ' + p.v : undefined }),
+        res: [['Altura h', F(h) + ' mm'], ['Ángulo θ', F(th, 2) + '°'], ['Par sin vuelo', F(Math.hypot(a, h)) + ' mm'], ['Par con vuelo', F((a + p.v) / cos(th)) + ' mm'], ['Limatesa (4 aguas)', F(sq(2 * a * a + h * h)) + ' mm'], ['Pendiente de la lima', F(phi, 2) + '°'], ['Rebaje de la lima', F(atan(sin(phi)), 2) + '°'], ['Corte de cumbrera', F(90 - th, 2) + '°']] }; } },
+  { k: 'tol', n: 'Inglete compuesto', ps: [['n', 'Número de lados', 3, 12, 1, 4, ''], ['t', 'Inclinación desde la vertical', 0, 89, 1, 20, '°']],
+    f(p) { const m = 180 / p.n, X = atan(sin(p.t) * tan(m)), Y = asin(cos(p.t) * sin(m));
+      return { fig: figTolva(p.t, p.n, { t: p.t + '°', X: 'X = ' + F(X, 1) + '°' }), res: [['Giro de la mesa X', F(X, 2) + '°'], ['Inclinación de la hoja Y', F(Y, 2) + '°'], ['Marco plano (t = 90°)', F(m, 2) + '°'], ['Caja recta (t = 0): hoja', F(m, 2) + '°']] }; } },
+  { k: 'ic3', n: 'Inglete compuesto en 3D', d3: true, ps: [['n', 'Número de lados', 3, 8, 1, 4, ''], ['t', 'Inclinación desde la vertical', 0, 75, 1, 25, '°'], ['s', 'Separar un costado', 0, 100, 1, 60, '%']],
+    f(p) { const m = 180 / p.n, X = atan(sin(p.t) * tan(m)), Y = asin(cos(p.t) * sin(m));
+      return { res: [['Giro de la mesa X', F(X, 2) + '°'], ['Inclinación de la hoja Y', F(Y, 2) + '°'], ['Marco plano sería', F(m, 2) + '°']] }; } },
+  { k: 'arc', n: 'Arco: cuerda y flecha', ps: [['c', 'Cuerda', 200, 3000, 10, 1600, 'mm'], ['f', 'Flecha', 10, 1500, 5, 150, 'mm']],
+    lim(p) { p.f = Math.min(p.f, p.c / 2); },
+    f(p) { const R = p.c * p.c / (8 * p.f) + p.f / 2, th = 2 * asin(p.c / 2 / R);
+      return { fig: figArco(p.c, p.f, { c: 'c = ' + N(p.c), f: 'f = ' + p.f, R: 'R = ' + F(R) }), res: [['Radio R', F(R) + ' mm'], ['Centro bajo la cuerda', F(R - p.f) + ' mm'], ['Ángulo del arco', F(th, 2) + '°'], ['Largo del arco', F(Math.PI * R * th / 180) + ' mm']] }; } },
+  { k: 'oji', n: 'Arco ojival', ps: [['L', 'Luz', 300, 2000, 10, 900, 'mm'], ['h', 'Altura de la punta', 150, 3000, 10, 1000, 'mm']],
+    lim(p) { p.h = Math.max(p.h, p.L / 2); },
+    f(p) { const R = (p.h * p.h + p.L * p.L / 4) / p.L, b = acos((R - p.L / 2) / R), eq = p.L * sq(3) / 2;
+      const tipo = Math.abs(p.h - eq) < p.L * 0.01 ? 'equilátero' : p.h > eq ? 'de lanceta (más apuntado)' : 'rebajado';
+      return { fig: figOjival(p.L, p.h, { L: 'L = ' + N(p.L), h: 'h = ' + N(p.h), R: 'R = ' + F(R) }), res: [['Radio R', F(R) + ' mm'], ['Ángulo de cada arco', F(b, 2) + '°'], ['Largo de cada arco', F(Math.PI * R * b / 180) + ' mm'], ['Tipo', tipo], ['Equilátero sería h =', F(eq) + ' mm']] }; } },
+  { k: 'esc', n: 'Escalera', ps: [['H', 'Altura entre pisos', 2000, 3500, 10, 2700, 'mm'], ['n', 'Contrahuellas', 8, 22, 1, 15, '']],
+    f(p) { const c = p.H / p.n, h = 630 - 2 * c, ok = c >= 130 && c <= 185 && h >= 280;
+      return { fig: figEscalera({ c: 'c = ' + F(c), h: 'h = ' + F(h), H: 'H = ' + N(p.H) }), res: [['Contrahuella c', F(c) + ' mm'], ['Huella h (Blondel)', F(h) + ' mm'], ['Recorrido', F((p.n - 1) * h) + ' mm'], ['Ángulo', F(atan(c / h), 2) + '°'], ['Uso general (orientativo)', ok ? '✓ dentro' : '✗ fuera']] }; } },
+  { k: 'esq', n: 'Radio de esquina', ps: [['t', 'Ángulo de la esquina', 30, 170, 1, 90, '°'], ['r', 'Radio', 2, 60, 1, 10, 'mm']],
+    f(p) { const s = sin(p.t / 2), d = p.r * (1 - s) / s;
+      return { fig: figEsquinaTheta(p.t, d), res: [['d (vértice → arco)', F(d, 3) + ' mm'], ['r / d', F(s / (1 - s), 3)], ['Tangencia a', F(p.r / tan(p.t / 2), 2) + ' mm del vértice']] }; } },
+];
+const EX = { k: 'tri', p: {} };
+function exPintaLista() { $('ex-lista').innerHTML = EXP.map(e => `<button data-k="${e.k}" class="${e.k === EX.k ? 'on' : ''}">${e.n}</button>`).join(''); }
+function exElige(k) {
+  EX.k = k; const e = EXP.find(x => x.k === k); EX.p = {}; e.ps.forEach(q => EX.p[q[0]] = q[5]);
+  exPintaLista(); $('ex-tit').textContent = e.n;
+  $('ex-ctrl').innerHTML = e.ps.map(q => `<div><label>${q[1]}${q[6] ? ' (' + q[6] + ')' : ''}</label><div class="fila"><input type="range" id="exr-${q[0]}" min="${q[2]}" max="${q[3]}" step="${q[4]}" value="${q[5]}"><input type="number" id="exn-${q[0]}" min="${q[2]}" max="${q[3]}" step="${q[4]}" value="${q[5]}"></div></div>`).join('');
+  e.ps.forEach(q => {
+    const r = $('exr-' + q[0]), n = $('exn-' + q[0]);
+    r.oninput = () => { n.value = r.value; EX.p[q[0]] = +r.value; exDibuja(); };
+    n.oninput = () => { const v = leer(n.value); if (v === null) return; EX.p[q[0]] = Math.min(Math.max(v, q[2]), q[3]); r.value = EX.p[q[0]]; exDibuja(); };
+  });
+  exDibuja();
+}
+function exDibuja() {
+  const e = EXP.find(x => x.k === EX.k), p = Object.assign({}, EX.p); if (e.lim) e.lim(p);
+  e.ps.forEach(q => { if (p[q[0]] !== EX.p[q[0]]) { $('exr-' + q[0]).value = p[q[0]]; $('exn-' + q[0]).value = p[q[0]]; } });
+  const o = e.f(p);
+  if (e.d3) {
+    const fg = $('ex-fig');
+    if (!t3Init()) fg.innerHTML = '<p class="aviso" style="padding:20px">No se encuentra <code>assets/three.min.js</code>. Para la vista 3D, el programa tiene que estar junto a su carpeta <code>assets</code>.</p>';
+    else { if (!fg.querySelector('canvas.t3')) { fg.innerHTML = ''; fg.appendChild(T3.r.domElement); fg.insertAdjacentHTML('beforeend', '<div class="esc">El costado naranja se separa para ver la cara del inglete (en coral). Arrastra para girar.</div>'); t3Tam(); } t3Tolva(p.n, p.t, p.s / 100); }
+  } else $('ex-fig').innerHTML = o.fig; $('ex-res').innerHTML = o.res.map(r => `<div><span>${r[0]}</span><b>${r[1]}</b></div>`).join('');
+}
+
+/* ================================================================ arranque */
+function setTema(t) { document.documentElement.setAttribute('data-theme', t); try { localStorage.setItem('mm-tema', t); } catch (e) { } }
+(function () {
+  let t = null; try { t = localStorage.getItem('mm-tema'); } catch (e) { }
+  if (t) document.documentElement.setAttribute('data-theme', t);
+  $('tema-btn').onclick = () => { const cur = document.documentElement.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); setTema(cur === 'dark' ? 'light' : 'dark'); };
+  pintaTemas();
+  $('temas').onclick = ev => { const b = ev.target.closest('button'); if (!b) return; S.tema = b.dataset.t; pintaTemas(); nuevo(); };
+  $('niveles').onclick = ev => { const b = ev.target.closest('button'); if (!b) return; S.nivel = +b.dataset.n; document.querySelectorAll('#niveles button').forEach(x => x.classList.toggle('on', x === b)); nuevo(); };
+  $('nuevo').onclick = nuevo;
+  document.querySelectorAll('header nav button').forEach(b => b.onclick = () => {
+    document.querySelectorAll('header nav button').forEach(x => x.classList.toggle('on', x === b));
+    document.querySelectorAll('.vista').forEach(v => v.classList.toggle('on', v.id === 'v-' + b.dataset.v));
+  });
+  $('ex-lista').onclick = ev => { const b = ev.target.closest('button'); if (b) exElige(b.dataset.k); };
+  $('ex-grande').onclick = () => { $('v-explorar').classList.toggle('grande'); t3Tam(); };
+  exElige('tri');
+  $('f-gen').onclick = genFicha; $('f-imp').onclick = () => window.print();
+  nuevo();
+})();
+</script>
+</body>
+</html>

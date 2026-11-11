@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Made-máticas · Matemáticas para la madera</title>
+<meta name="description" content="Apuntes y programa para sacar medidas y ángulos en carpintería con Pitágoras y trigonometría, sin abrir el CAD.">
+<style>
+:root { --azul: #005A9C; --naranja: #C4580C; --tinta: #1c2733; --sub: #5d6d7e; --borde: #d5dde5; --fondo: #e9edf2; --panel: #ffffff; --suave: #f4f6f8; }
+@media (prefers-color-scheme: dark) { :root { --azul: #5aa7e0; --naranja: #f0883e; --tinta: #e3e9ef; --sub: #9fb0c0; --borde: #33414f; --fondo: #141b22; --panel: #1d262f; --suave: #25303b; } }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: 'Segoe UI', 'DejaVu Sans', Arial, sans-serif; background: var(--fondo); color: var(--tinta); line-height: 1.55; }
+header { background: #005A9C; color: #fff; padding: 34px 20px 30px; }
+header .in, main, footer { max-width: 1040px; margin: 0 auto; }
+header .sup { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: #ffd2ad; font-weight: 700; }
+header h1 { margin: 6px 0 8px; font-size: 38px; line-height: 1.1; }
+header p { margin: 0; max-width: 700px; font-size: 17px; opacity: .92; }
+main { padding: 26px 16px 10px; }
+.tarjetas { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+.tarjeta { background: var(--panel); border: 1px solid var(--borde); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; }
+.tarjeta .fig { background: #fff; border-bottom: 1px solid var(--borde); padding: 14px; display: flex; justify-content: center; }
+.tarjeta .fig svg { width: 100%; max-width: 420px; height: auto; }
+.tarjeta .cuerpo { padding: 18px 20px 20px; display: flex; flex-direction: column; flex: 1; }
+.tarjeta h2 { margin: 0 0 4px; color: var(--azul); font-size: 22px; }
+.tarjeta .etq { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--naranja); font-weight: 700; }
+.tarjeta p { margin: 8px 0 12px; color: var(--sub); }
+.tarjeta ul { margin: 0 0 16px; padding-left: 20px; color: var(--sub); font-size: 15px; }
+.botones { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; }
+.btn { display: inline-block; text-decoration: none; background: #C4580C; color: #fff; padding: 9px 16px; border-radius: 6px; font-weight: 700; font-size: 15px; }
+.btn.azul { background: #005A9C; }
+.btn.sec { background: var(--suave); color: var(--tinta); border: 1px solid var(--borde); font-weight: 600; }
+.indice { background: var(--panel); border: 1px solid var(--borde); border-radius: 10px; padding: 18px 22px; margin-top: 20px; }
+.indice h2 { margin: 0 0 10px; font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--naranja); }
+.indice ol { columns: 3 220px; margin: 0; padding-left: 22px; font-size: 15px; }
+.indice li { margin: 2px 0; break-inside: avoid; }
+footer { padding: 22px 16px 30px; font-size: 13px; color: var(--sub); text-align: center; }
+footer a { color: var(--azul); }
+</style>
+</head>
+<body>
+<header><div class="in">
+  <div class="sup">Carpintería y mueble</div>
+  <h1>Made-máticas</h1>
+  <p>Matemáticas para la madera: cómo sacar medidas y ángulos de una pieza con Pitágoras, trigonometría y la calculadora, sin abrir el CAD.</p>
+</div></header>
+<main>
+  <div class="tarjetas">
+    <section class="tarjeta">
+      <div class="fig">
+        <svg viewBox="0 0 420 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="30" y="20" width="360" height="160" rx="8" fill="#f4f6f8" stroke="#d5dde5"/>
+          <rect x="30" y="20" width="360" height="26" rx="8" fill="#005A9C"/><rect x="30" y="38" width="360" height="8" fill="#005A9C"/>
+          <polygon points="120,150 270,150 270,70" fill="rgba(0,90,156,.08)"/>
+          <line x1="120" y1="150" x2="270" y2="150" stroke="#005A9C" stroke-width="4"/>
+          <line x1="270" y1="150" x2="270" y2="70" stroke="#c0392b" stroke-width="4"/>
+          <line x1="120" y1="150" x2="270" y2="70" stroke="#1e8449" stroke-width="4"/>
+          <path d="M160,150 A40,40 0 0,0 155.3,131.2" fill="none" stroke="#1c2733" stroke-width="2"/>
+          <rect x="295" y="70" width="70" height="22" rx="4" fill="#fdecea" stroke="#c0392b"/>
+          <rect x="295" y="104" width="70" height="22" rx="4" fill="#edf7f0" stroke="#1e8449"/>
+          <text x="330" y="86" font-size="12" text-anchor="middle" fill="#c0392b" font-family="Arial" font-weight="700">✗ 21.5</text>
+          <text x="330" y="120" font-size="12" text-anchor="middle" fill="#1e8449" font-family="Arial" font-weight="700">✓ 28.1°</text>
+        </svg>
+      </div>
+      <div class="cuerpo">
+        <div class="etq">Programa</div>
+        <h2>Practicar y explorar</h2>
+        <p>Funciona en el navegador, sin instalar nada y sin conexión una vez descargado.</p>
+        <ul>
+          <li>Ejercicios al azar de 11 temas y 3 niveles, con dibujo, corrección al momento, pista y solución paso a paso.</li>
+          <li>Fichas imprimibles con versiones distintas para cada alumno y sus soluciones.</li>
+          <li>Explorar: figuras con deslizadores y el inglete compuesto en 3D, para la pizarra digital.</li>
+        </ul>
+        <div class="botones">
+          <a class="btn" href="programa/">Abrir el programa</a>
+          <a class="btn sec" href="descargas/matematicas_madera.zip" download>Descargar (zip)</a>
+          <a class="btn sec" href="programa/guia.html">Guía</a>
+          <a class="btn sec" href="programa/guia.pdf">Guía en PDF</a>
+        </div>
+      </div>
+    </section>
+    <section class="tarjeta">
+      <div class="fig">
+        <svg viewBox="0 0 420 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="120" y="14" width="180" height="176" fill="#fff" stroke="#d5dde5"/>
+          <rect x="134" y="28" width="90" height="8" fill="#005A9C"/><rect x="134" y="40" width="152" height="2" fill="#C4580C"/>
+          <rect x="134" y="50" width="152" height="4" fill="#d5dde5"/><rect x="134" y="58" width="130" height="4" fill="#d5dde5"/>
+          <path d="M160,140 A60,60 0 0,1 260,140 Z" fill="#ead7b8" stroke="#a9825a" stroke-width="2"/>
+          <line x1="210" y1="140" x2="210" y2="112" stroke="#d35400" stroke-width="3"/>
+          <rect x="134" y="152" width="152" height="14" rx="3" fill="#fdf3ec" stroke="#f3d6c2"/>
+          <text x="210" y="163" font-size="9" text-anchor="middle" fill="#1c2733" font-family="monospace">R = c² / 8f + f / 2</text>
+          <rect x="134" y="172" width="110" height="4" fill="#d5dde5"/>
+        </svg>
+      </div>
+      <div class="cuerpo">
+        <div class="etq">Apuntes</div>
+        <h2>Matemáticas para la madera</h2>
+        <p>Apuntes para el alumnado, con dibujos, ejemplos resueltos, ejercicios de tres niveles y soluciones.</p>
+        <ul>
+          <li>15 capítulos: de Pitágoras y la trigonometría a cubiertas, ingletes compuestos, arcos y escaleras de caracol.</li>
+          <li>Un proyecto completo (un banco de jardín), errores típicos y formulario.</li>
+        </ul>
+        <div class="botones">
+          <a class="btn azul" href="apuntes/">Leer los apuntes</a>
+          <a class="btn sec" href="apuntes/matematicas_madera_apuntes.pdf">Descargar PDF</a>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="indice">
+    <h2>Contenido de los apuntes</h2>
+    <ol>
+      <li>Antes de empezar</li><li>Pitágoras en el taller</li><li>Trigonometría: ángulos y lados</li><li>Escaleras</li><li>Ingletes y polígonos</li>
+      <li>Arcos: cuerda, flecha y radio</li><li>El radio de una esquina redondeada</li><li>Repartos y proporciones</li><li>Del taller a la CNC</li><li>Cubiertas y cerchas</li>
+      <li>Ingletes compuestos</li><li>Arcos de carpintería</li><li>Escaleras de caracol</li><li>Cubicación y presupuesto</li><li>Proyecto: un banco de jardín</li>
+    </ol>
+  </div>
+</main>
+<footer>
+  Made-máticas · © 2026 Eloi A.A. · Programa con licencia <a href="https://eupl.eu/1.2/es/">EUPL-1.2</a> · Apuntes y guía con licencia <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.es">CC BY-SA 4.0</a>
+</footer>
+</body>
+</html>
