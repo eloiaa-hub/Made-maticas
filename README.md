@@ -11,7 +11,6 @@ Apuntes y programa para sacar medidas y ángulos en carpintería y ebanistería 
 | `index.html` | Página principal |
 | `programa/` | El programa (`index.html` + `assets/three.min.js`) y su guía en HTML y PDF |
 | `apuntes/` | Los apuntes en HTML y PDF |
-| `descargas/` | El programa en un zip para usarlo sin conexión |
 
 ## Programa
 
@@ -19,8 +18,6 @@ Apuntes y programa para sacar medidas y ángulos en carpintería y ebanistería 
 - **Ficha imprimible:** hojas con varias versiones y soluciones.
 - **Explorar:** figuras con deslizadores e inglete compuesto en 3D.
 - **Formulario.**
-
-Para usarlo sin conexión, descarga `descargas/matematicas_madera.zip`, descomprímelo y abre `matematicas_madera.html`. La carpeta `assets` tiene que ir junto al HTML (la necesita la vista 3D).
 
 ## Apuntes
 
