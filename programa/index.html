@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Matemáticas para la madera</title>
+<title>Matemáticas para la madera</title><link rel="icon" href="../favicon.svg" type="image/svg+xml"><meta property="og:type" content="website"><meta property="og:url" content="https://eloiaa-hub.github.io/Made-maticas/programa/"><meta property="og:title" content="Programa · Made-máticas"><meta property="og:description" content="Ejercicios de Pitágoras y trigonometría para la madera, con corrección, fichas y figuras en 3D."><meta property="og:image" content="https://eloiaa-hub.github.io/Made-maticas/og.png"><meta name="twitter:card" content="summary_large_image">
 <style>
 :root {
   --azul: #005A9C; --naranja: #C4580C; --nar2: #d35400; --verde: #1e8449; --rojo: #c0392b;
@@ -56,6 +56,8 @@ main { max-width: 1180px; margin: 0 auto; padding: 16px; }
 .ej-cab { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
 .ej-cab h3 { margin: 0; font-size: 18px; color: var(--azul); }
 .ej-cab .niv { font-size: 12px; letter-spacing: 1px; }
+.ver-apuntes { margin-left: auto; font-size: 13px; font-weight: 600; color: var(--azul); text-decoration: none; border: 1px solid var(--borde); border-radius: 5px; padding: 4px 10px; background: var(--suave); }
+.ver-apuntes:hover { border-color: var(--azul); }
 .enun { font-size: 15.5px; margin: 6px 0 10px; }
 .fig { background: #fff; border: 1px solid var(--borde); border-radius: 8px; padding: 6px; margin: 10px 0; text-align: center; }
 .fig svg { width: 100%; max-width: 640px; height: auto; display: block; margin: 0 auto; }
@@ -1020,11 +1022,16 @@ function pintaTemas() {
   $('temas').innerHTML = TEMAS.map(t => `<button data-t="${t.k}" class="${t.k === S.tema ? 'on' : ''}">${t.n}</button>`).join('');
   $('f-temas').innerHTML = TEMAS.map(t => `<label class="chk"><input type="checkbox" class="f-tema" value="${t.k}" checked> ${t.n}</label>`).join('');
 }
+const CAP_APUNTES = { pit: 2, trig: 3, esc: 4, ing: 5, arc: 6, esq: 7, rep: 8, cnc: 9, cub: 10, icp: 11, arm: 12 };
+function enlaceApuntes(t) {
+  if (!/^https?:$/.test(location.protocol) || !CAP_APUNTES[t]) return '';
+  return `<a class="ver-apuntes" href="../apuntes/#cap-${CAP_APUNTES[t]}" target="_blank" rel="noopener">Ver en los apuntes · cap. ${CAP_APUNTES[t]}</a>`;
+}
 function nuevo() {
   RND = Math.random; S.ej = generar(S.tema, S.nivel); S.intento = 0; S.contado = false; S.pista = false; S.visto = false;
   const e = S.ej, t = TEMAS.find(x => x.k === e.tema).n;
   $('ejercicio').innerHTML = `
-    <div class="ej-cab"><h3>${t}</h3>${htmlNivel(e.nivel)}</div>
+    <div class="ej-cab"><h3>${t}</h3>${htmlNivel(e.nivel)}${enlaceApuntes(e.tema)}</div>
     <div class="enun">${e.e}</div>
     <div class="fig">${e.fig}</div>
     ${e.nota ? `<div class="aviso">${e.nota}</div>` : ''}
@@ -1222,6 +1229,16 @@ function setTema(t) { document.documentElement.setAttribute('data-theme', t); tr
   $('ex-grande').onclick = () => { $('v-explorar').classList.toggle('grande'); t3Tam(); };
   exElige('tri');
   $('f-gen').onclick = genFicha; $('f-imp').onclick = () => window.print();
+  // enlaces directos: ?tema=esc&nivel=2, ?vista=explorar&figura=ic3
+  let qp = null; try { qp = new URLSearchParams(location.search); } catch (e) { }
+  if (qp) {
+    const tq = qp.get('tema'), nq = +qp.get('nivel'), vq = qp.get('vista'), fq = qp.get('figura');
+    if (tq && GEN[tq]) { S.tema = tq; pintaTemas(); }
+    if ([1, 2, 3].includes(nq)) { S.nivel = nq; document.querySelectorAll('#niveles button').forEach(x => x.classList.toggle('on', +x.dataset.n === nq)); }
+    if (fq && EXP.some(x => x.k === fq)) exElige(fq);
+    if (vq && document.getElementById('v-' + vq)) { const b = document.querySelector(`header nav button[data-v="${vq}"]`); if (b) b.click(); }
+    else if (fq && EXP.some(x => x.k === fq)) document.querySelector('header nav button[data-v="explorar"]').click();
+  }
   nuevo();
 })();
 </script>
